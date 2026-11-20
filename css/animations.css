@@ -527,6 +527,22 @@ article:hover .washi-tape::after,
 /* --------------------------------------------------------------------------
    9. ACCESSIBILITY COMPLIANCE (REDUCED MOTION)
    -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .reveal-from-left,
+  .reveal-from-right {
+    transform: translateY(24px);
+  }
+
+  .reveal-from-left.is-revealed,
+  .reveal-from-right.is-revealed {
+    transform: translateY(0);
+  }
+
+  .reveal-stamp {
+    transform: scale(0.96) rotate(var(--rot, 0deg));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
