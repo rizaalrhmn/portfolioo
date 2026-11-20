@@ -2611,6 +2611,17 @@ button {
   }
 }
 
+/* Footer logo link back to Home */
+.footer-home-link {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.footer-home-link:hover {
+  color: var(--color-pink);
+}
+
 /* ==========================================================================
    DARK & LIGHT MODE TOGGLE BUTTON + DARK THEME PALETTE
    ========================================================================== */
