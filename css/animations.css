@@ -1,0 +1,550 @@
+/* ==========================================================================
+   RIZAL RAHMAN — COMPREHENSIVE SUITE OF PROFESSIONAL & UNIQUE ANIMATIONS
+   Hardware-accelerated 60fps animations, scroll-driven reveals, 3D tilt physics,
+   scrapbook stamp dynamics, parallax elements, and tactile micro-interactions.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. UNIQUE SCRAPBOOK SCROLL PROGRESS BAR (TOP OF VIEWPORT)
+   -------------------------------------------------------------------------- */
+.scrapbook-scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: rgba(24, 24, 27, 0.05);
+  z-index: 10001;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.scroll-progress-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(
+    90deg,
+    #F43F5E 0%,
+    #FB923C 20%,
+    #FBBF24 40%,
+    #10B981 60%,
+    #38BDF8 80%,
+    #818CF8 100%
+  );
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+  position: relative;
+  transition: transform 0.06s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+/* Playful drawing marker nib at the leading edge of progress */
+.scroll-progress-nib {
+  position: absolute;
+  right: -10px;
+  top: -8px;
+  font-size: 14px;
+  line-height: 1;
+  transform: rotate(20deg);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  pointer-events: none;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. SCROLL-DRIVEN REVEAL SYSTEM (INTERSECTION OBSERVER)
+   -------------------------------------------------------------------------- */
+
+/* Default Vertical Lift & Fade */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Unique Scrapbook Stamp Reveal: Drops & stamps firmly down onto paper */
+.reveal-stamp {
+  opacity: 0;
+  transform: scale(1.12) rotate(calc(var(--rot, 0deg) - 4deg));
+  transition: opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-stamp.is-revealed {
+  opacity: 1;
+  transform: scale(1) rotate(var(--rot, 0deg));
+}
+
+/* Slide in from Left */
+.reveal-from-left {
+  opacity: 0;
+  transform: translateX(-45px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-from-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide in from Right */
+.reveal-from-right {
+  opacity: 0;
+  transform: translateX(45px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-from-right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Gentle Pop In */
+.reveal-pop {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-pop.is-revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Auto-Stagger for Grids and Child Items */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-stagger.is-revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger.is-revealed > *:nth-child(1) { transition-delay: 0.05s; }
+.reveal-stagger.is-revealed > *:nth-child(2) { transition-delay: 0.12s; }
+.reveal-stagger.is-revealed > *:nth-child(3) { transition-delay: 0.19s; }
+.reveal-stagger.is-revealed > *:nth-child(4) { transition-delay: 0.26s; }
+.reveal-stagger.is-revealed > *:nth-child(5) { transition-delay: 0.33s; }
+.reveal-stagger.is-revealed > *:nth-child(6) { transition-delay: 0.40s; }
+.reveal-stagger.is-revealed > *:nth-child(7) { transition-delay: 0.47s; }
+.reveal-stagger.is-revealed > *:nth-child(8) { transition-delay: 0.54s; }
+
+/* --------------------------------------------------------------------------
+   3. 3D TACTILE CARD TILT PHYSICS WITH AMBIENT GLOSS
+   -------------------------------------------------------------------------- */
+.tilt-card-active {
+  transform-style: preserve-3d;
+  will-change: transform;
+  position: relative;
+  transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+}
+
+.tilt-card-active:hover {
+  z-index: 12;
+}
+
+/* Gloss reflection beam that sweeps across the card */
+.tilt-card-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.tilt-card-active:hover::before {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   4. PAGE LOAD ENTRANCE CHOREOGRAPHY
+   -------------------------------------------------------------------------- */
+@keyframes heroCutoutDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.92) rotate(-3deg);
+  }
+  60% {
+    transform: translateY(6px) scale(1.03) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes heroLeadFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) rotate(-4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(-2deg);
+  }
+}
+
+@keyframes polaroidDropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.88) rotate(8deg);
+  }
+  70% {
+    transform: translateY(-8px) scale(1.02) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(-1.5deg);
+  }
+}
+
+@keyframes badgeShineSlide {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.page-ready .hero-cutout-title {
+  animation: heroCutoutDrop 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
+}
+
+.page-ready .hero-handwritten-lead {
+  animation: heroLeadFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.05s;
+}
+
+.page-ready .hero-polaroid-frame {
+  animation: polaroidDropIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.25s;
+}
+
+/* --------------------------------------------------------------------------
+   5. INTERACTIVE METRIC COUNTER PULSES
+   -------------------------------------------------------------------------- */
+.metric-counter-number {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.25s ease;
+}
+
+.counter-animated {
+  animation: counterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes counterPop {
+  0%   { transform: scale(0.85); color: var(--color-pink); }
+  50%  { transform: scale(1.15); color: var(--color-blue); }
+  100% { transform: scale(1); }
+}
+
+/* Metric chip container styling */
+.scrapbook-stat-counter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  font-family: var(--font-cutout);
+  font-size: 1rem;
+  color: var(--ink-primary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.scrapbook-stat-counter-chip:hover {
+  transform: translateY(-3px) rotate(-1deg);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  border-color: var(--color-blue);
+}
+
+/* --------------------------------------------------------------------------
+   6. CIRCULAR SCROLL PROGRESS BACK-TO-TOP BUTTON
+   -------------------------------------------------------------------------- */
+.floating-back-to-top {
+  position: fixed;
+  bottom: 2.2rem;
+  right: 2.2rem;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.85);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.back-to-top-circle-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.back-to-top-circle-wrap:hover {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+
+.back-to-top-circle-wrap:active {
+  transform: translateY(-2px) scale(0.95);
+}
+
+.back-to-top-svg-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.back-to-top-circle-bg {
+  fill: none;
+  stroke: #E2E8F0;
+  stroke-width: 3.5;
+}
+
+.back-to-top-circle-progress {
+  fill: none;
+  stroke: url(#backToTopGrad);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 126;
+  stroke-dashoffset: 126;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.back-to-top-icon {
+  font-size: 1.15rem;
+  z-index: 2;
+  transition: transform 0.25s ease;
+  color: var(--ink-primary);
+}
+
+.back-to-top-circle-wrap:hover .back-to-top-icon {
+  transform: translateY(-3px);
+}
+
+/* Launch Rocket animation on click */
+.back-to-top-circle-wrap.is-launching .back-to-top-icon {
+  animation: rocketLaunchUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes rocketLaunchUp {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(4px) scale(0.9); }
+  100% { transform: translateY(-35px) scale(0.6); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   7. TACTILE MICRO-ANIMATIONS (POST-IT FLUTTER & WASHI SHINE)
+   -------------------------------------------------------------------------- */
+
+/* Post-It Flutter on Hover */
+@keyframes stickyFlutter {
+  0%   { transform: rotate(var(--rot, 0deg)) translateY(0); }
+  25%  { transform: rotate(calc(var(--rot, 0deg) + 2deg)) translateY(-4px); }
+  50%  { transform: rotate(calc(var(--rot, 0deg) - 1.5deg)) translateY(-6px); }
+  75%  { transform: rotate(calc(var(--rot, 0deg) + 1deg)) translateY(-4px); }
+  100% { transform: rotate(var(--rot, 0deg)) translateY(-6px); }
+}
+
+.sticky-note-card:hover {
+  animation: stickyFlutter 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Washi Tape Sheen Sweep on Card Hover */
+.washi-tape {
+  position: relative;
+  overflow: hidden;
+}
+
+.washi-tape::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-25deg);
+  transition: none;
+}
+
+article:hover .washi-tape::after,
+.ruled-paper:hover .washi-tape::after,
+.sticky-note-card:hover .washi-tape::after,
+.blog-hero-sheet:hover .washi-tape::after {
+  animation: washiSheenSweep 0.8s ease forwards;
+}
+
+@keyframes washiSheenSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Pill & Button Tactile Spring Press */
+.btn-scrapbook-primary,
+.btn-scrapbook-secondary,
+.header-cta-btn,
+.btn-view-study,
+.filter-pill,
+.admin-tab-btn {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease !important;
+}
+
+.btn-scrapbook-primary:hover,
+.btn-scrapbook-secondary:hover,
+.header-cta-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn-scrapbook-primary:active,
+.btn-scrapbook-secondary:active,
+.header-cta-btn:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Subtle landing focus indicator when scrolled into view */
+.scroll-landed-pulse {
+  animation: sectionLandedGlow 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sectionLandedGlow {
+  0% {
+    outline: 3px solid rgba(59, 130, 246, 0.6);
+    outline-offset: 8px;
+  }
+  50% {
+    outline: 3px solid rgba(244, 63, 94, 0.4);
+    outline-offset: 12px;
+  }
+  100% {
+    outline: 3px solid transparent;
+    outline-offset: 16px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. TAB TRANSITION & ADMIN PANE ANIMATIONS
+   -------------------------------------------------------------------------- */
+.tab-pane {
+  animation: tabFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Open Page Unfold Effect */
+.scrapbook-modal-backdrop.open .article-modal-window,
+.scrapbook-modal-backdrop.open .modal-scrapbook-window {
+  animation: modalUnfold 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes modalUnfold {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) rotate(-3deg) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. PARALLAX FLOATING SCRAPBOOK STICKERS & STARS
+   -------------------------------------------------------------------------- */
+[data-parallax] {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* Playful floating sticker ambient hover wiggle */
+.sticker-wiggle:hover {
+  animation: stickerWiggle 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes stickerWiggle {
+  0% { transform: rotate(-3deg) scale(1.05); }
+  100% { transform: rotate(3deg) scale(1.05); }
+}
+
+/* --------------------------------------------------------------------------
+   9. ACCESSIBILITY COMPLIANCE (REDUCED MOTION)
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-on-scroll,
+  .reveal-stamp,
+  .reveal-from-left,
+  .reveal-from-right,
+  .reveal-pop,
+  .reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .scrapbook-scroll-progress-bar {
+    display: none !important;
+  }
+}

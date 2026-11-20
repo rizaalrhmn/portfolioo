@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal & Notes — Rizal Rahman | Digital Marketing & Design</title>
+  <meta name="description" content="Essays, frameworks, and notes on digital marketing, generative AI visuals, motion design, and creative direction by Rizal Rahman.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold'>R</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Kalam:wght@400;700&family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Silkscreen&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/blog.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/ai-pet.css">
+  <script src="js/theme.js"></script>
+</head>
+<body>
+
+  <!-- Unique Scrapbook Scroll Progress Bar (Top of Viewport) -->
+  <div class="scrapbook-scroll-progress-bar" id="scroll-progress-bar" aria-hidden="true">
+    <div class="scroll-progress-fill" id="scroll-progress-fill">
+      <span class="scroll-progress-nib" id="scroll-progress-nib" title="Scroll Progress">✏️</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== -->
+  <header class="scrapbook-header" id="site-header">
+    <div class="container">
+      <div class="header-nav-row">
+        <a href="index.html" class="brand-stamp" aria-label="Rizal Rahman Home">
+          RIZAL<span class="brand-dot">★</span>
+        </a>
+
+        <nav aria-label="Primary Navigation">
+          <ul class="nav-links-list" id="nav-menu">
+            <li><a href="index.html#home" class="nav-link">Home</a></li>
+            <li><a href="index.html#about" class="nav-link">About</a></li>
+            <li><a href="index.html#resume" class="nav-link">Resume</a></li>
+            <li><a href="index.html#specialties" class="nav-link">Specialties</a></li>
+            <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+            <li><a href="blog.html" class="nav-link active">Blog ★</a></li>
+            <li><a href="admin.html" class="nav-link" style="color: var(--color-purple);" title="Admin Portal">Admin 🔒</a></li>
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Switch to dark mode" title="Toggle Dark / Light Mode">
+            <span class="theme-icon-sun" aria-hidden="true">☀️</span>
+            <span class="theme-icon-moon" aria-hidden="true">🌙</span>
+          </button>
+          <a href="index.html#contact" class="header-cta-btn">
+            Let's Talk <span>✎</span>
+          </a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         BLOG HERO (SCRAPBOOK JOURNAL COVER)
+         ========================================================================== -->
+    <section class="blog-hero">
+      <div class="container">
+        <div class="blog-hero-sheet grid-paper reveal-stamp">
+          <div class="washi-tape tape-tl tape-yellow"></div>
+          <div class="washi-tape tape-tr tape-pink"></div>
+          
+          <div class="blog-eyebrow">Rizal's Notebook ✎</div>
+          <h1 class="blog-title-cutout">JOURNAL & NOTES</h1>
+          
+          <p class="blog-subtitle-note">
+            Field notes on high-converting performance marketing, generative AI visuals, brand identities, and creative direction from India.
+          </p>
+
+          <div style="display: inline-flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+            <button type="button" class="btn-scrapbook-primary" onclick="window.openPublicBlogEditor && window.openPublicBlogEditor()" style="font-size: 0.9rem; padding: 0.5rem 1.3rem;">
+              ➕ Add New Blog Post <span>✎</span>
+            </button>
+            <a href="admin.html" class="btn-scrapbook-secondary" style="font-size: 0.85rem; padding: 0.45rem 1.1rem;">
+              <span>🔒</span> Admin Portal
+            </a>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="blog-controls-wrapper reveal-on-scroll">
+          <div class="blog-search-box">
+            <span class="blog-search-icon">🔍</span>
+            <input type="text" id="blog-search-input" class="blog-search-input" placeholder="Search by topic, keyword, or tag...">
+          </div>
+
+          <div class="blog-filter-pills" id="category-filters">
+            <button class="filter-pill active" data-category="all">All Entries</button>
+            <button class="filter-pill" data-category="Digital Marketing">Digital Marketing</button>
+            <button class="filter-pill" data-category="AI & Creative Tech">AI & Creative Tech</button>
+            <button class="filter-pill" data-category="Design & Branding">Design & Branding</button>
+            <button class="filter-pill" data-category="Motion & Video">Motion & Video</button>
+          </div>
+        </div>
+
+        <!-- Articles Grid Container -->
+        <div class="blog-grid reveal-stagger" id="blog-articles-grid">
+          <!-- Dynamically populated from js/blog-store.js -->
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       ARTICLE READER MODAL
+       ========================================================================== -->
+  <div class="scrapbook-modal-backdrop" id="article-modal" aria-hidden="true" role="dialog">
+    <div class="article-modal-window ruled-paper">
+      <button class="modal-close-btn" id="article-modal-close" aria-label="Close article">✕</button>
+      
+      <div class="washi-tape tape-tl tape-yellow"></div>
+      <div class="washi-tape tape-tr tape-blue"></div>
+
+      <header class="article-header">
+        <span class="article-category-tag" id="modal-article-category">Category</span>
+        <h2 class="article-title-display" id="modal-article-title">Article Title</h2>
+        <div class="article-meta-info">
+          <span id="modal-article-date">Date</span>
+          <span>•</span>
+          <span id="modal-article-time">Read Time</span>
+          <span>•</span>
+          <span id="modal-article-views">0 views</span>
+        </div>
+      </header>
+
+      <img id="modal-article-image" class="article-featured-image" src="" alt="Article cover">
+
+      <div class="article-body-text" id="modal-article-content">
+        <!-- Full Article HTML injected here -->
+      </div>
+
+      <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px dashed #E4E4E7; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="font-family: var(--font-handwriting); font-size: 1.4rem; color: var(--ink-secondary);">
+          Written by Rizal Rahman ✦ Manager at Monochrome FX
+        </div>
+        <button class="btn-scrapbook-primary" id="article-modal-done-btn" style="font-size: 0.9rem; padding: 0.5rem 1.4rem;">
+          Back to Journal ↑
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SCRAPBOOK FOOTER
+       ========================================================================== -->
+  <footer class="scrapbook-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-stamp-mark">
+          RIZAL RAHMAN<span style="color: var(--color-pink);">®</span>
+        </div>
+
+        <div>
+          Handcrafted with paper, tape & code • <a href="admin.html" style="text-decoration: underline; color: var(--color-purple);">Admin Portal</a>
+        </div>
+
+        <button class="btn-back-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+          Back to Top ↑
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Unique Scrapbook Floating Circular Back-to-Top Button -->
+  <button class="floating-back-to-top back-to-top-circle-wrap" id="floating-back-to-top" title="Launch Back to Top" aria-label="Launch back to top">
+    <svg class="back-to-top-svg-ring" viewBox="0 0 48 48">
+      <defs>
+        <linearGradient id="backToTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#F43F5E" />
+          <stop offset="50%" stop-color="#3B82F6" />
+          <stop offset="100%" stop-color="#10B981" />
+        </linearGradient>
+      </defs>
+      <circle class="back-to-top-circle-bg" cx="24" cy="24" r="20" />
+      <circle class="back-to-top-circle-progress" id="btt-circle-progress" cx="24" cy="24" r="20" />
+    </svg>
+    <span class="back-to-top-icon">🚀</span>
+  </button>
+
+  <!-- Scripts -->
+  <script src="js/content-store.js"></script>
+  <script src="js/blog-store.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/ai-pet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initBlogPage();
+    });
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    function initBlogPage() {
+      if (typeof initPublicBlogEditor === 'function') {
+        initPublicBlogEditor(renderBlogGrid);
+      }
+      renderBlogGrid();
+
+      // Mobile Menu
+      const toggle = document.getElementById('mobile-toggle');
+      const menu = document.getElementById('nav-menu');
+      if (toggle && menu) {
+        toggle.addEventListener('click', () => {
+          menu.classList.toggle('open');
+        });
+      }
+
+      // Filter Pills
+      const filterPills = document.querySelectorAll('#category-filters .filter-pill');
+      filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          filterPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentCategory = pill.getAttribute('data-category');
+          renderBlogGrid();
+        });
+      });
+
+      // Search Input
+      const searchInput = document.getElementById('blog-search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          searchQuery = e.target.value.toLowerCase().trim();
+          renderBlogGrid();
+        });
+      }
+
+      // Article Reader Modal Close Handlers
+      const modal = document.getElementById('article-modal');
+      const closeBtn = document.getElementById('article-modal-close');
+      const doneBtn = document.getElementById('article-modal-done-btn');
+
+      const closeModal = () => {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+      };
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (doneBtn) doneBtn.addEventListener('click', closeModal);
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal();
+        });
+      }
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+      });
+    }
+
+    function renderBlogGrid() {
+      const grid = document.getElementById('blog-articles-grid');
+      if (!grid) return;
+
+      const allPosts = getBlogPosts().filter(p => p.status === 'published');
+      
+      const filtered = allPosts.filter(post => {
+        const matchesCategory = currentCategory === 'all' || post.category === currentCategory;
+        const matchesSearch = !searchQuery || 
+          post.title.toLowerCase().includes(searchQuery) || 
+          post.excerpt.toLowerCase().includes(searchQuery) ||
+          (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery)));
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: #fff; border-radius: 12px; border: 2px dashed #E2E8F0;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📓</div>
+            <h3 style="font-family: var(--font-cutout); font-size: 1.6rem; color: var(--ink-primary);">No entries found</h3>
+            <p style="color: var(--ink-muted); margin-top: 0.4rem;">Try adjusting your search query or category filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const tapeColors = ['tape-yellow', 'tape-pink', 'tape-blue', 'tape-cream'];
+      const fillerHtml = typeof getScrapbookFillerDoodles === 'function' ? getScrapbookFillerDoodles(filtered.length, 3) : '';
+
+      grid.innerHTML = filtered.map((post, index) => {
+        const tapeClass = tapeColors[index % tapeColors.length];
+        return `
+          <article class="blog-card reveal-on-scroll" onclick="openArticle('${post.id}')">
+            <div class="blog-card-media">
+              <span class="blog-badge-category">${post.category}</span>
+              <div class="washi-tape tape-tr ${tapeClass}"></div>
+              <img src="${post.coverImage || 'assets/images/project-1-art.jpg'}" alt="${post.title}" loading="lazy">
+            </div>
+
+            <div class="blog-card-content">
+              <div class="blog-meta-row">
+                <span>${post.date}</span>
+                <span class="blog-meta-dot">✦</span>
+                <span>${post.readTime}</span>
+              </div>
+
+              <h2 class="blog-card-title">${post.title}</h2>
+              <p class="blog-card-excerpt">${post.excerpt}</p>
+
+              <div class="blog-card-footer">
+                <span class="btn-read-entry">Read Entry <span>↗</span></span>
+                <div style="display: inline-flex; align-items: center; gap: 0.6rem;">
+                  <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.openPublicBlogEditor && window.openPublicBlogEditor('${post.id}')" title="Edit this blog post">✎ Edit</button>
+                  <span class="blog-views-count">👁 ${post.views || 0}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('') + fillerHtml;
+
+      if (window.refreshScrapbookAnimations) {
+        window.refreshScrapbookAnimations();
+      }
+    }
+
+    function openArticle(postId) {
+      const post = getBlogPost(postId);
+      if (!post) return;
+
+      incrementPostView(postId);
+
+      document.getElementById('modal-article-category').textContent = post.category;
+      document.getElementById('modal-article-title').textContent = post.title;
+      document.getElementById('modal-article-date').textContent = post.date;
+      document.getElementById('modal-article-time').textContent = post.readTime;
+      document.getElementById('modal-article-views').textContent = `${(post.views || 0) + 1} reads`;
+      
+      const imgEl = document.getElementById('modal-article-image');
+      if (post.coverImage) {
+        imgEl.src = post.coverImage;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+      }
+
+      document.getElementById('modal-article-content').innerHTML = post.content || `<p>${post.excerpt}</p>`;
+
+      const modal = document.getElementById('article-modal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  </script>
+</body>
+</html>

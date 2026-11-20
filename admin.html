@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — Content Manager | Rizal Rahman</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold'>R</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Kalam:wght@400;700&family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Silkscreen&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/blog.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    /* Admin navigation tabs */
+    .admin-tab-nav {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px dashed rgba(24, 24, 27, 0.12);
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .admin-tab-btn {
+      font-family: var(--font-cutout);
+      font-size: 1.05rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius-pill);
+      background-color: #FFFFFF;
+      color: var(--ink-secondary);
+      border: 1.5px solid #CBD5E1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+    .admin-tab-btn:hover {
+      background-color: var(--washi-yellow);
+      color: var(--ink-primary);
+      transform: translateY(-2px);
+    }
+    .admin-tab-btn.active {
+      background-color: var(--ink-primary);
+      color: #FFFFFF;
+      border-color: var(--ink-primary);
+    }
+    .tab-badge-count {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background-color: rgba(255, 255, 255, 0.25);
+      padding: 0.1rem 0.5rem;
+      border-radius: var(--radius-pill);
+    }
+    .admin-tab-btn.active .tab-badge-count {
+      background-color: var(--color-pink);
+      color: #FFFFFF;
+    }
+    /* Action Bar */
+    .action-bar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .btn-add-content {
+      font-family: var(--font-cutout);
+      font-size: 1rem;
+      font-weight: 700;
+      background-color: var(--color-mint);
+      color: #FFFFFF;
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: var(--transition);
+    }
+    .btn-add-content:hover {
+      background-color: #059669;
+      transform: translateY(-2px);
+    }
+    /* Cards list for projects & testimonials */
+    .admin-cards-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.8rem;
+      align-items: stretch;
+    }
+    @media (max-width: 992px) {
+      .admin-cards-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .admin-cards-list {
+        grid-template-columns: 1fr;
+      }
+    }
+    .admin-item-card {
+      background-color: #FAFAFA;
+      border: 1px solid #E4E4E7;
+      border-radius: 12px;
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: var(--transition);
+    }
+    .admin-item-card:hover {
+      background-color: #FFFFFF;
+      border-color: #CBD5E1;
+      box-shadow: var(--shadow-paper);
+    }
+    .item-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
+      padding-top: 0.8rem;
+      border-top: 1px dashed #E4E4E7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Unique Scrapbook Scroll Progress Bar (Top of Viewport) -->
+  <div class="scrapbook-scroll-progress-bar" id="scroll-progress-bar" aria-hidden="true">
+    <div class="scroll-progress-fill" id="scroll-progress-fill">
+      <span class="scroll-progress-nib" id="scroll-progress-nib" title="Scroll Progress">✏️</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       HEADER
+       ========================================================================== -->
+  <header class="scrapbook-header" id="site-header">
+    <div class="container">
+      <div class="header-nav-row">
+        <div class="brand-stamp">
+          RIZAL<span class="brand-dot">★</span> <span class="admin-badge">CONTENT MANAGER</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <a href="blog.html" class="nav-link" target="_blank">View Blog ↗</a>
+          <a href="index.html" class="nav-link" target="_blank">Portfolio ↗</a>
+          <button id="logout-btn" class="filter-pill" style="display: none; border-color: var(--color-pink); color: var(--color-pink);">
+            Logout ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container admin-wrapper">
+    
+    <!-- ==========================================================================
+         LOGIN SCREEN (SHOWN WHEN LOGGED OUT)
+         ========================================================================== -->
+    <div id="login-container" class="admin-login-frame grid-paper">
+      <div class="washi-tape tape-tl tape-pink"></div>
+      <div class="washi-tape tape-tr tape-yellow"></div>
+
+      <div class="login-key-icon">🔐</div>
+      <h1 style="font-family: var(--font-cutout); font-size: 2.2rem; color: var(--ink-primary); margin-bottom: 0.4rem;">
+        Content Manager
+      </h1>
+      <p style="font-size: 0.95rem; color: var(--ink-muted); margin-bottom: 2rem;">
+        Add, edit, and delete projects, blog posts, praise, and profile info.
+      </p>
+
+      <form id="login-form" style="display: flex; flex-direction: column; gap: 1.2rem; text-align: left;">
+        <div>
+          <label class="form-label" for="admin-pin-input">Enter Admin Passcode or PIN</label>
+          <input type="password" id="admin-pin-input" class="admin-input" placeholder="Enter PIN (Default: 1234 or admin)" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
+          Enter Content Manager <span>→</span>
+        </button>
+
+        <button type="button" id="quick-demo-login-btn" class="filter-pill" style="width: 100%; text-align: center; background-color: var(--color-mint-soft); color: var(--color-mint); border-color: var(--color-mint);">
+          ⚡ Quick 1-Click Access
+        </button>
+      </form>
+    </div>
+
+    <!-- ==========================================================================
+         DASHBOARD VIEW (SHOWN WHEN LOGGED IN)
+         ========================================================================== -->
+    <div id="dashboard-container" style="display: none;">
+      
+      <!-- Top Metrics Ribbon -->
+      <div class="admin-stats-grid reveal-stagger">
+        <div class="stat-card tilt-card-active">
+          <div class="washi-tape tape-tl tape-yellow" style="width: 60px; height: 18px;"></div>
+          <div class="stat-num" id="stat-blog-count">0</div>
+          <div class="stat-label">Blog Articles</div>
+        </div>
+        <div class="stat-card tilt-card-active">
+          <div class="washi-tape tape-tr tape-pink" style="width: 60px; height: 18px;"></div>
+          <div class="stat-num" id="stat-projects-count" style="color: var(--color-blue);">0</div>
+          <div class="stat-label">Portfolio Projects</div>
+        </div>
+        <div class="stat-card tilt-card-active">
+          <div class="washi-tape tape-tl tape-blue" style="width: 60px; height: 18px;"></div>
+          <div class="stat-num" id="stat-testimonials-count" style="color: var(--color-mint);">0</div>
+          <div class="stat-label">Client Endorsements</div>
+        </div>
+        <div class="stat-card tilt-card-active">
+          <div class="washi-tape tape-tr tape-yellow" style="width: 60px; height: 18px;"></div>
+          <div class="stat-num" id="stat-blog-views" style="color: var(--color-purple);">0</div>
+          <div class="stat-label">Total Blog Reads</div>
+        </div>
+      </div>
+
+      <!-- Content Section Tabs -->
+      <nav class="admin-tab-nav" aria-label="Content Tabs">
+        <button class="admin-tab-btn active" data-tab="tab-blog">
+          <span>📓</span> Blog Articles <span class="tab-badge-count" id="badge-blog">0</span>
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-projects">
+          <span>🎨</span> Portfolio Projects <span class="tab-badge-count" id="badge-projects">0</span>
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-testimonials">
+          <span>💬</span> Testimonials & Praise <span class="tab-badge-count" id="badge-testimonials">0</span>
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-profile">
+          <span>👤</span> Profile & Bio
+        </button>
+      </nav>
+
+      <!-- ====================================================================
+           TAB 1: BLOG ARTICLES
+           ==================================================================== -->
+      <div id="tab-blog" class="tab-pane">
+        
+        <!-- Action Bar -->
+        <div class="action-bar-top">
+          <div>
+            <h2 style="font-family: var(--font-cutout); font-size: 1.8rem; color: var(--ink-primary);">
+              Journal Articles
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--ink-muted);">
+              Add new articles, edit drafts, or delete published essays.
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+            <button type="button" class="btn-add-content" onclick="openBlogEditor()">
+              ➕ Add New Article
+            </button>
+          </div>
+        </div>
+
+        <!-- Blog Form (hidden until Add or Edit is clicked) -->
+        <div id="blog-editor-card" class="admin-manager-card" style="display: none; border: 2px solid var(--color-pink);">
+          <div class="washi-tape tape-tl tape-pink"></div>
+          <div class="washi-tape tape-tr tape-yellow"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 id="blog-form-heading" style="font-family: var(--font-cutout); font-size: 1.6rem; color: var(--ink-primary);">
+              Add New Article ✎
+            </h3>
+            <button type="button" class="filter-pill" onclick="closeBlogEditor()">
+              ✕ Close Editor
+            </button>
+          </div>
+
+          <form id="blog-post-form">
+            <input type="hidden" id="blog-edit-id" value="">
+
+            <div class="editor-form-grid">
+              <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div>
+                  <label class="form-label" for="blog-title">Article Title</label>
+                  <input type="text" id="blog-title" class="admin-input" placeholder="e.g. 5 Visual Rules for 3x Higher ROAS on Meta" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="blog-excerpt">Short Excerpt / Hook</label>
+                  <textarea id="blog-excerpt" class="admin-textarea" rows="3" placeholder="Brief summary displayed on the card..." required></textarea>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <label class="form-label" for="blog-content">Full Article Body (HTML / Text)</label>
+                    <div style="display: flex; gap: 0.3rem;">
+                      <button type="button" class="btn-admin-action" onclick="insertTagBlog('<h3>', '</h3>')">H3</button>
+                      <button type="button" class="btn-admin-action" onclick="insertTagBlog('<b>', '</b>')">Bold</button>
+                      <button type="button" class="btn-admin-action" onclick="insertTagBlog('<div class=\'blog-callout-note\'>', '</div>')">Note</button>
+                      <button type="button" class="btn-admin-action" onclick="insertTagBlog('<ul><li>', '</li></ul>')">List</button>
+                    </div>
+                  </div>
+                  <textarea id="blog-content" class="admin-textarea" rows="9" placeholder="Full paragraphs with HTML tags..." required></textarea>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 1.2rem; background-color: #FAFAFA; padding: 1.5rem; border-radius: 12px; border: 1px dashed #CBD5E1;">
+                <div>
+                  <label class="form-label" for="blog-category">Category</label>
+                  <select id="blog-category" class="admin-select" required>
+                    <option value="Digital Marketing">Digital Marketing</option>
+                    <option value="AI & Creative Tech">AI & Creative Tech</option>
+                    <option value="Design & Branding">Design & Branding</option>
+                    <option value="Motion & Video">Motion & Video</option>
+                    <option value="Strategy & Leadership">Strategy & Leadership</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="form-label" for="blog-read-time">Read Time</label>
+                  <input type="text" id="blog-read-time" class="admin-input" value="5 min read" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="blog-image">Cover Artwork</label>
+                  <input type="text" id="blog-image" class="admin-input" value="assets/images/project-2-art.jpg" required>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem;">
+                    <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-1-art.jpg')">Mihdab</button>
+                    <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-2-art.jpg')">RPM</button>
+                    <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-3-art.jpg')">Zviz</button>
+                    <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-4-card.jpg')">Aura</button>
+                    <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-5-card.jpg')">Kinetix</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="form-label" for="blog-status">Status</label>
+                  <select id="blog-status" class="admin-select">
+                    <option value="published">Published (Visible on Live Blog)</option>
+                    <option value="draft">Draft (Hidden)</option>
+                  </select>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                  <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
+                    Save Article ✦
+                  </button>
+                  <button type="button" class="btn-scrapbook-secondary" style="justify-content: center; width: 100%;" onclick="closeBlogEditor()">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Blog Articles Table -->
+        <div class="admin-manager-card">
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Reads</th>
+                  <th style="text-align: right;">Options</th>
+                </tr>
+              </thead>
+              <tbody id="blog-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+           TAB 2: PORTFOLIO PROJECTS
+           ==================================================================== -->
+      <div id="tab-projects" class="tab-pane" style="display: none;">
+        
+        <div class="action-bar-top">
+          <div>
+            <h2 style="font-family: var(--font-cutout); font-size: 1.8rem; color: var(--ink-primary);">
+              Portfolio Projects
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--ink-muted);">
+              Add new projects, edit case study solutions, or delete projects. Updates reflect on the home portfolio immediately.
+            </p>
+          </div>
+
+          <button type="button" class="btn-add-content" onclick="openProjectEditor()">
+            ➕ Add New Project
+          </button>
+        </div>
+
+        <!-- Project Editor Form (hidden until Add or Edit is clicked) -->
+        <div id="project-editor-card" class="admin-manager-card" style="display: none; border: 2px solid var(--color-blue);">
+          <div class="washi-tape tape-tl tape-blue"></div>
+          <div class="washi-tape tape-tr tape-yellow"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 id="project-form-heading" style="font-family: var(--font-cutout); font-size: 1.6rem; color: var(--ink-primary);">
+              Add New Project 🎨
+            </h3>
+            <button type="button" class="filter-pill" onclick="closeProjectEditor()">
+              ✕ Close Editor
+            </button>
+          </div>
+
+          <form id="project-form">
+            <input type="hidden" id="project-edit-id" value="">
+
+            <div class="editor-form-grid">
+              <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div>
+                  <label class="form-label" for="project-title">Project Title</label>
+                  <input type="text" id="project-title" class="admin-input" placeholder="e.g. MIHDAB Luxury Perfume" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-subtitle">Project Subtitle</label>
+                  <input type="text" id="project-subtitle" class="admin-input" placeholder="e.g. Artisanal Fragrance Branding & Calligraphy" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-excerpt">Short Card Excerpt</label>
+                  <textarea id="project-excerpt" class="admin-textarea" rows="2" placeholder="Summary shown on the project card..." required></textarea>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-challenge">Creative Challenge (for Case Study Modal)</label>
+                  <textarea id="project-challenge" class="admin-textarea" rows="3" placeholder="Describe the creative or market challenge..." required></textarea>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-solution">Strategic & Visual Solution (for Case Study Modal)</label>
+                  <textarea id="project-solution" class="admin-textarea" rows="3" placeholder="Describe the solution and execution..." required></textarea>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 1.2rem; background-color: #FAFAFA; padding: 1.5rem; border-radius: 12px; border: 1px dashed #CBD5E1;">
+                <div>
+                  <label class="form-label" for="project-category">Category</label>
+                  <input type="text" id="project-category" class="admin-input" placeholder="e.g. Digital Marketing & Ads" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-client">Client / Brand</label>
+                  <input type="text" id="project-client" class="admin-input" placeholder="e.g. Rapid Paramedic Medicine" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-role">My Role</label>
+                  <input type="text" id="project-role" class="admin-input" placeholder="e.g. Lead Designer & Strategist" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-impact">Impact Metric</label>
+                  <input type="text" id="project-impact" class="admin-input" placeholder="e.g. +240% Growth" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-tools">Software & Tools</label>
+                  <input type="text" id="project-tools" class="admin-input" placeholder="e.g. Meta Ads, After Effects, Figma, Photoshop" required>
+                </div>
+
+                <div>
+                  <label class="form-label" for="project-image">Artwork Image File</label>
+                  <input type="text" id="project-image" class="admin-input" value="assets/images/project-1-art.jpg" required>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem;">
+                    <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-1-art.jpg')">Art 1</button>
+                    <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-2-art.jpg')">Art 2</button>
+                    <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-3-art.jpg')">Art 3</button>
+                    <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-4-card.jpg')">Card 4</button>
+                    <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-5-card.jpg')">Card 5</button>
+                  </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                  <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
+                    Save Project ✦
+                  </button>
+                  <button type="button" class="btn-scrapbook-secondary" style="justify-content: center; width: 100%;" onclick="closeProjectEditor()">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Projects Grid List -->
+        <div class="admin-cards-list" id="projects-list-container">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+           TAB 3: TESTIMONIALS & PRAISE
+           ==================================================================== -->
+      <div id="tab-testimonials" class="tab-pane" style="display: none;">
+        
+        <div class="action-bar-top">
+          <div>
+            <h2 style="font-family: var(--font-cutout); font-size: 1.8rem; color: var(--ink-primary);">
+              Client Endorsements & Sticky Praise
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--ink-muted);">
+              Add client feedback, edit quotes, or delete testimonials.
+            </p>
+          </div>
+
+          <button type="button" class="btn-add-content" onclick="openTestimonialEditor()">
+            ➕ Add New Testimonial
+          </button>
+        </div>
+
+        <!-- Testimonial Form (hidden until Add or Edit is clicked) -->
+        <div id="testimonial-editor-card" class="admin-manager-card" style="display: none; border: 2px solid var(--color-mint); max-width: 680px; margin: 0 auto 2.5rem;">
+          <div class="washi-tape tape-tl tape-yellow"></div>
+          <div class="washi-tape tape-tr tape-pink"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 id="testimonial-form-heading" style="font-family: var(--font-cutout); font-size: 1.6rem; color: var(--ink-primary);">
+              Add New Endorsement 💬
+            </h3>
+            <button type="button" class="filter-pill" onclick="closeTestimonialEditor()">
+              ✕ Close
+            </button>
+          </div>
+
+          <form id="testimonial-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <input type="hidden" id="testimonial-edit-id" value="">
+
+            <div>
+              <label class="form-label" for="testimonial-author">Author / Client Name</label>
+              <input type="text" id="testimonial-author" class="admin-input" placeholder="e.g. Sarah Al-Mansoor" required>
+            </div>
+
+            <div>
+              <label class="form-label" for="testimonial-role">Author Role / Company</label>
+              <input type="text" id="testimonial-role" class="admin-input" placeholder="e.g. Founder, Mihdab Fragrances" required>
+            </div>
+
+            <div>
+              <label class="form-label" for="testimonial-quote">Quote / Endorsement</label>
+              <textarea id="testimonial-quote" class="admin-textarea" rows="4" placeholder="Write the endorsement quote..." required></textarea>
+            </div>
+
+            <div>
+              <label class="form-label" for="testimonial-color">Sticky Note Color Style</label>
+              <select id="testimonial-color" class="admin-select">
+                <option value="sticky-yellow">Yellow Post-It</option>
+                <option value="sticky-pink">Pink Post-It</option>
+                <option value="sticky-blue">Pastel Blue Post-It</option>
+              </select>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; margin-top: 0.5rem;">
+              <button type="submit" class="btn-scrapbook-primary" style="flex: 1; justify-content: center;">
+                Save Endorsement ✦
+              </button>
+              <button type="button" class="btn-scrapbook-secondary" onclick="closeTestimonialEditor()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Testimonials Cards Grid -->
+        <div class="admin-cards-list" id="testimonials-list-container">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+           TAB 4: PROFILE & BIO
+           ==================================================================== -->
+      <div id="tab-profile" class="tab-pane" style="display: none;">
+        
+        <div class="admin-manager-card" style="max-width: 820px; margin: 0 auto;">
+          <div class="washi-tape tape-tl tape-yellow"></div>
+          <div class="washi-tape tape-tr tape-pink"></div>
+
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-family: var(--font-cutout); font-size: 2rem; color: var(--ink-primary);">
+              Edit Profile, Tagline & Bio 👤
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--ink-muted);">
+              Updates will automatically sync with your homepage.
+            </p>
+          </div>
+
+          <form id="profile-form" style="display: flex; flex-direction: column; gap: 1.4rem;">
+            <div>
+              <label class="form-label" for="profile-tagline">Homepage Headline / Tagline</label>
+              <textarea id="profile-tagline" class="admin-textarea" rows="2" required></textarea>
+            </div>
+
+            <div>
+              <label class="form-label" for="profile-role">Hero Section Role Badge</label>
+              <input type="text" id="profile-role" class="admin-input" required>
+            </div>
+
+            <div>
+              <label class="form-label" for="profile-email">Direct Contact Email</label>
+              <input type="email" id="profile-email" class="admin-input" required>
+            </div>
+
+            <div>
+              <label class="form-label" for="profile-bio-1">About Me — Paragraph 1 (Introduction)</label>
+              <textarea id="profile-bio-1" class="admin-textarea" rows="3" required></textarea>
+            </div>
+
+            <div>
+              <label class="form-label" for="profile-bio-2">About Me — Paragraph 2 (Philosophy & Experience)</label>
+              <textarea id="profile-bio-2" class="admin-textarea" rows="3" required></textarea>
+            </div>
+
+            <div>
+              <label class="form-label" for="profile-bio-3">About Me — Paragraph 3 (Specialties & Vision)</label>
+              <textarea id="profile-bio-3" class="admin-textarea" rows="3" required></textarea>
+            </div>
+
+            <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; align-self: flex-start;">
+              Save Profile Changes ✦
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Reset Data Footer Bar -->
+      <div style="margin-top: 4rem; padding-top: 2rem; border-top: 2px dashed rgba(24, 24, 27, 0.12); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted);">
+          All edits are saved locally in your browser (localStorage).
+        </span>
+        <button type="button" id="reset-all-btn" class="filter-pill" style="color: var(--color-pink); border-color: var(--color-pink);">
+          🔄 Reset All Content to Original Defaults
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Unique Scrapbook Floating Circular Back-to-Top Button -->
+  <button class="floating-back-to-top back-to-top-circle-wrap" id="floating-back-to-top" title="Launch Back to Top" aria-label="Launch back to top">
+    <svg class="back-to-top-svg-ring" viewBox="0 0 48 48">
+      <defs>
+        <linearGradient id="backToTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#F43F5E" />
+          <stop offset="50%" stop-color="#3B82F6" />
+          <stop offset="100%" stop-color="#10B981" />
+        </linearGradient>
+      </defs>
+      <circle class="back-to-top-circle-bg" cx="24" cy="24" r="20" />
+      <circle class="back-to-top-circle-progress" id="btt-circle-progress" cx="24" cy="24" r="20" />
+    </svg>
+    <span class="back-to-top-icon">🚀</span>
+  </button>
+
+  <!-- Scripts -->
+  <script src="js/content-store.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initContentAdmin();
+    });
+
+    function initContentAdmin() {
+      // Auth Check
+      if (new URLSearchParams(window.location.search).get('auth') === '1' || isAdminLoggedIn()) {
+        setAdminLoggedIn(true);
+        showDashboard();
+      } else {
+        showLogin();
+      }
+
+      // Login Handlers
+      document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pin = document.getElementById('admin-pin-input').value.trim();
+        if (pin === 'admin' || pin === '1234' || pin === 'rizal') {
+          setAdminLoggedIn(true);
+          showDashboard();
+        } else {
+          alert('Invalid passcode. Use "admin" or "1234".');
+        }
+      });
+
+      document.getElementById('quick-demo-login-btn').addEventListener('click', () => {
+        setAdminLoggedIn(true);
+        showDashboard();
+      });
+
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        setAdminLoggedIn(false);
+        showLogin();
+      });
+
+      // Tab Switching
+      const tabButtons = document.querySelectorAll('.admin-tab-btn');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const target = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+          document.getElementById(target).style.display = 'block';
+        });
+      });
+
+      // Blog Post Form Submit
+      document.getElementById('blog-post-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveBlogForm();
+      });
+
+      // Project Form Submit
+      document.getElementById('project-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveProjectForm();
+      });
+
+      // Testimonial Form Submit
+      document.getElementById('testimonial-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveTestimonialForm();
+      });
+
+      // Profile Form Submit
+      document.getElementById('profile-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveProfileForm();
+      });
+
+      // Reset All Content Button
+      document.getElementById('reset-all-btn').addEventListener('click', () => {
+        resetAllContent();
+        loadAllData();
+        showAdminToast('🔄 All content restored to original defaults!');
+      });
+
+      // Delegated Click Handler for all Table & Card Action Buttons
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-admin-action]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const action = btn.getAttribute('data-admin-action');
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+
+        if (action === 'edit-blog') editBlogPost(id);
+        else if (action === 'toggle-blog') toggleBlog(id);
+        else if (action === 'delete-blog') removeBlogPost(id);
+        else if (action === 'edit-project') editProject(id);
+        else if (action === 'delete-project') removeProject(id);
+        else if (action === 'edit-testimonial') editTestimonial(id);
+        else if (action === 'delete-testimonial') removeTestimonial(id);
+      });
+    }
+
+    // Custom Scrapbook Toast Notification with Optional Undo Button
+    let adminToastTimer = null;
+    function showAdminToast(message, undoCallback = null) {
+      let toast = document.getElementById('admin-toast-banner');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'admin-toast-banner';
+        toast.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#18181B; color:#FFFFFF; padding:0.75rem 1.35rem; border-radius:999px; font-family:var(--font-body); font-size:0.9rem; font-weight:700; display:flex; align-items:center; gap:0.85rem; box-shadow:0 12px 30px rgba(0,0,0,0.28); z-index:99999; opacity:0; pointer-events:none; transition:all 0.25s ease;';
+        document.body.appendChild(toast);
+      }
+
+      toast.innerHTML = `<span>${message}</span>`;
+      if (typeof undoCallback === 'function') {
+        const undoBtn = document.createElement('button');
+        undoBtn.type = 'button';
+        undoBtn.textContent = '↶ Undo';
+        undoBtn.style.cssText = 'background:#FEF08A; color:#18181B; border:none; padding:0.25rem 0.7rem; border-radius:999px; font-family:var(--font-mono); font-size:0.78rem; font-weight:700; cursor:pointer;';
+        undoBtn.onclick = () => {
+          undoCallback();
+          toast.style.opacity = '0';
+          toast.style.pointerEvents = 'none';
+        };
+        toast.appendChild(undoBtn);
+      }
+
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.pointerEvents = 'auto';
+
+      if (adminToastTimer) clearTimeout(adminToastTimer);
+      adminToastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+        toast.style.pointerEvents = 'none';
+      }, 4500);
+    }
+
+    function showLogin() {
+      document.getElementById('login-container').style.display = 'block';
+      document.getElementById('dashboard-container').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('dashboard-container').style.display = 'block';
+      document.getElementById('logout-btn').style.display = 'inline-block';
+      loadAllData();
+    }
+
+    function loadAllData() {
+      renderBlogTable();
+      renderProjectsList();
+      renderTestimonialsList();
+      renderProfileForm();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const blogs = getBlogPosts();
+      const projs = getProjects();
+      const tests = getTestimonials();
+      const totalViews = blogs.reduce((s, p) => s + (p.views || 0), 0);
+
+      document.getElementById('stat-blog-count').textContent = blogs.length;
+      document.getElementById('stat-projects-count').textContent = projs.length;
+      document.getElementById('stat-testimonials-count').textContent = tests.length;
+      document.getElementById('stat-blog-views').textContent = totalViews;
+
+      document.getElementById('badge-blog').textContent = blogs.length;
+      document.getElementById('badge-projects').textContent = projs.length;
+      document.getElementById('badge-testimonials').textContent = tests.length;
+
+      if (typeof window.refreshScrapbookAnimations === 'function') {
+        window.refreshScrapbookAnimations();
+      }
+    }
+
+    /* ----------------------------------------------------------------------
+       1. BLOG ARTICLES (ADD, EDIT, DELETE)
+       ---------------------------------------------------------------------- */
+    function renderBlogTable() {
+      const posts = getBlogPosts();
+      const tbody = document.getElementById('blog-table-body');
+      if (!tbody) return;
+
+      if (posts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--ink-muted);">No blog articles yet. Click "Add New Article" above!</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = posts.map(post => {
+        const isPub = post.status === 'published';
+        return `
+          <tr>
+            <td style="font-weight:700; color:var(--ink-primary); max-width:280px;">${post.title}</td>
+            <td><span class="skill-chip" style="font-size:0.75rem;">${post.category}</span></td>
+            <td>
+              <span class="status-badge ${isPub ? 'status-published' : 'status-draft'}">
+                ${isPub ? '● Published' : '○ Draft'}
+              </span>
+            </td>
+            <td style="font-family:var(--font-mono); font-size:0.82rem; color:var(--ink-muted);">${post.date || 'Today'}</td>
+            <td style="font-family:var(--font-mono); font-size:0.82rem; color:var(--ink-muted);">${post.views || 0}</td>
+            <td style="text-align:right;">
+              <div style="display:inline-flex; gap:0.4rem; position:relative; z-index:10;">
+                <button type="button" class="btn-admin-action" data-admin-action="edit-blog" data-id="${post.id}" title="Edit Article">✎ Edit</button>
+                <button type="button" class="btn-admin-action" data-admin-action="toggle-blog" data-id="${post.id}" title="Toggle Status">${isPub ? 'Draft' : 'Publish'}</button>
+                <button type="button" class="btn-admin-action btn-admin-delete" data-admin-action="delete-blog" data-id="${post.id}" title="Delete">🗑 Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openBlogEditor() {
+      document.getElementById('blog-edit-id').value = '';
+      document.getElementById('blog-post-form').reset();
+      document.getElementById('blog-form-heading').textContent = 'Add New Article ✎';
+      document.getElementById('blog-image').value = 'assets/images/project-2-art.jpg';
+      document.getElementById('blog-read-time').value = '5 min read';
+      document.getElementById('blog-editor-card').style.display = 'block';
+      document.getElementById('blog-editor-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeBlogEditor() {
+      document.getElementById('blog-editor-card').style.display = 'none';
+      document.getElementById('blog-post-form').reset();
+    }
+
+    function editBlogPost(id) {
+      const posts = getBlogPosts();
+      const post = posts.find(p => p.id === id);
+      if (!post) return;
+
+      document.getElementById('blog-edit-id').value = post.id;
+      document.getElementById('blog-title').value = post.title;
+      document.getElementById('blog-excerpt').value = post.excerpt;
+      document.getElementById('blog-content').value = post.content || post.excerpt;
+      document.getElementById('blog-category').value = post.category;
+      document.getElementById('blog-read-time').value = post.readTime || '5 min read';
+      document.getElementById('blog-image').value = post.coverImage || 'assets/images/project-2-art.jpg';
+      document.getElementById('blog-status').value = post.status || 'published';
+
+      document.getElementById('blog-form-heading').textContent = 'Edit Article: ' + post.title;
+      document.getElementById('blog-editor-card').style.display = 'block';
+      document.getElementById('blog-editor-card').scrollIntoView({ behavior: 'smooth' });
+      showAdminToast('✎ Editing article: ' + post.title);
+    }
+
+    function saveBlogForm() {
+      const id = document.getElementById('blog-edit-id').value;
+      const title = document.getElementById('blog-title').value.trim();
+      const excerpt = document.getElementById('blog-excerpt').value.trim();
+      const content = document.getElementById('blog-content').value.trim();
+      const category = document.getElementById('blog-category').value;
+      const readTime = document.getElementById('blog-read-time').value.trim();
+      const coverImage = document.getElementById('blog-image').value.trim();
+      const status = document.getElementById('blog-status').value;
+
+      const payload = {
+        title, excerpt, content, category, readTime, coverImage, status,
+        date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())
+      };
+      if (id) payload.id = id;
+
+      saveBlogPost(payload);
+      closeBlogEditor();
+      loadAllData();
+      showAdminToast(id ? '✦ Article updated successfully!' : '✦ New article added successfully!');
+    }
+
+    function toggleBlog(id) {
+      const newStatus = togglePostStatus(id);
+      loadAllData();
+      showAdminToast(`✦ Article status changed to ${newStatus === 'published' ? 'Published' : 'Draft'}!`);
+    }
+
+    function removeBlogPost(id) {
+      const backup = [...getBlogPosts()];
+      const target = backup.find(p => p.id === id);
+      deleteBlogPost(id);
+      loadAllData();
+      showAdminToast(`🗑 Deleted article "${target ? target.title : id}"`, () => {
+        localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(backup));
+        loadAllData();
+        showAdminToast('✦ Article restored!');
+      });
+    }
+
+    function setBlogImage(path) {
+      document.getElementById('blog-image').value = path;
+    }
+
+    function insertTagBlog(openTag, closeTag) {
+      const textarea = document.getElementById('blog-content');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const sel = textarea.value.substring(start, end);
+      textarea.value = textarea.value.substring(0, start) + openTag + (sel || 'Text') + closeTag + textarea.value.substring(end);
+      textarea.focus();
+    }
+
+    /* ----------------------------------------------------------------------
+       2. PORTFOLIO PROJECTS (ADD, EDIT, DELETE)
+       ---------------------------------------------------------------------- */
+    function renderProjectsList() {
+      const projects = getProjects() || [];
+      const container = document.getElementById('projects-list-container');
+      if (!container) return;
+
+      const fillerHtml = typeof getScrapbookFillerDoodles === 'function' ? getScrapbookFillerDoodles(projects.length, 3) : '';
+
+      container.innerHTML = projects.map(proj => {
+        return `
+          <div class="admin-item-card">
+            <div style="height:140px; border-radius:8px; overflow:hidden; margin-bottom:1rem; background:#f4f4f5;">
+              <img src="${proj.image || 'assets/images/project-1-art.jpg'}" alt="${proj.title}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--color-pink); text-transform:uppercase; font-weight:700;">
+              ${proj.category}
+            </div>
+            <h4 style="font-family:var(--font-cutout); font-size:1.3rem; color:var(--ink-primary); margin:0.3rem 0;">
+              ${proj.title}
+            </h4>
+            <p style="font-size:0.88rem; color:var(--ink-secondary); line-height:1.5; flex:1;">
+              ${proj.excerpt}
+            </p>
+            <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--color-blue); margin-top:0.6rem; font-weight:700;">
+              Impact: ${proj.impact || '—'}
+            </div>
+            <div class="item-card-actions" style="position:relative; z-index:10;">
+              <button type="button" class="btn-admin-action" data-admin-action="edit-project" data-id="${proj.id}">✎ Edit</button>
+              <button type="button" class="btn-admin-action btn-admin-delete" data-admin-action="delete-project" data-id="${proj.id}">🗑 Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('') + fillerHtml;
+    }
+
+    function openProjectEditor() {
+      document.getElementById('project-edit-id').value = '';
+      document.getElementById('project-form').reset();
+      document.getElementById('project-form-heading').textContent = 'Add New Project 🎨';
+      document.getElementById('project-image').value = 'assets/images/project-1-art.jpg';
+      document.getElementById('project-editor-card').style.display = 'block';
+      document.getElementById('project-editor-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeProjectEditor() {
+      document.getElementById('project-editor-card').style.display = 'none';
+      document.getElementById('project-form').reset();
+    }
+
+    function editProject(id) {
+      const projects = getProjects();
+      const proj = projects.find(p => p.id === id);
+      if (!proj) return;
+
+      document.getElementById('project-edit-id').value = proj.id;
+      document.getElementById('project-title').value = proj.title;
+      document.getElementById('project-subtitle').value = proj.subtitle;
+      document.getElementById('project-category').value = proj.category;
+      document.getElementById('project-client').value = proj.client || '';
+      document.getElementById('project-role').value = proj.role || '';
+      document.getElementById('project-tools').value = proj.tools || '';
+      document.getElementById('project-impact').value = proj.impact || '';
+      document.getElementById('project-excerpt').value = proj.excerpt;
+      document.getElementById('project-challenge').value = proj.challenge || '';
+      document.getElementById('project-solution').value = proj.solution || '';
+      document.getElementById('project-image').value = proj.image || 'assets/images/project-1-art.jpg';
+
+      document.getElementById('project-form-heading').textContent = 'Edit Project: ' + proj.title;
+      document.getElementById('project-editor-card').style.display = 'block';
+      document.getElementById('project-editor-card').scrollIntoView({ behavior: 'smooth' });
+      showAdminToast('✎ Editing project: ' + proj.title);
+    }
+
+    function saveProjectForm() {
+      const id = document.getElementById('project-edit-id').value;
+      const title = document.getElementById('project-title').value.trim();
+      const subtitle = document.getElementById('project-subtitle').value.trim();
+      const category = document.getElementById('project-category').value.trim();
+      const client = document.getElementById('project-client').value.trim();
+      const role = document.getElementById('project-role').value.trim();
+      const tools = document.getElementById('project-tools').value.trim();
+      const impact = document.getElementById('project-impact').value.trim();
+      const excerpt = document.getElementById('project-excerpt').value.trim();
+      const challenge = document.getElementById('project-challenge').value.trim();
+      const solution = document.getElementById('project-solution').value.trim();
+      const image = document.getElementById('project-image').value.trim();
+
+      const payload = {
+        title, subtitle, category, client, role, tools, impact, excerpt, challenge, solution, image
+      };
+      if (id) payload.id = id;
+
+      saveProject(payload);
+      closeProjectEditor();
+      loadAllData();
+      showAdminToast(id ? '✦ Project updated successfully!' : '✦ New project added successfully!');
+    }
+
+    function removeProject(id) {
+      const backup = [...getProjects()];
+      const target = backup.find(p => p.id === id);
+      deleteProject(id);
+      loadAllData();
+      showAdminToast(`🗑 Deleted project "${target ? target.title : id}"`, () => {
+        localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(backup));
+        loadAllData();
+        showAdminToast('✦ Project restored!');
+      });
+    }
+
+    function setProjImage(path) {
+      document.getElementById('project-image').value = path;
+    }
+
+    /* ----------------------------------------------------------------------
+       3. TESTIMONIALS (ADD, EDIT, DELETE)
+       ---------------------------------------------------------------------- */
+    function renderTestimonialsList() {
+      const tests = getTestimonials() || [];
+      const container = document.getElementById('testimonials-list-container');
+      if (!container) return;
+
+      const fillerHtml = typeof getScrapbookFillerDoodles === 'function' ? getScrapbookFillerDoodles(tests.length, 3) : '';
+
+      container.innerHTML = tests.map(t => {
+        return `
+          <div class="admin-item-card ${t.colorClass || 'sticky-yellow'}" style="position:relative; transform:none; cursor:default;">
+            <p class="sticky-note-quote">${t.quote}</p>
+            <div class="sticky-note-author">
+              <div class="author-name">${t.author}</div>
+              <div class="author-role">${t.role}</div>
+            </div>
+            <div class="item-card-actions" style="position:relative; z-index:10;">
+              <button type="button" class="btn-admin-action" data-admin-action="edit-testimonial" data-id="${t.id}">✎ Edit</button>
+              <button type="button" class="btn-admin-action btn-admin-delete" data-admin-action="delete-testimonial" data-id="${t.id}">🗑 Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('') + fillerHtml;
+    }
+
+    function openTestimonialEditor() {
+      document.getElementById('testimonial-edit-id').value = '';
+      document.getElementById('testimonial-form').reset();
+      document.getElementById('testimonial-form-heading').textContent = 'Add New Endorsement 💬';
+      document.getElementById('testimonial-editor-card').style.display = 'block';
+      document.getElementById('testimonial-editor-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeTestimonialEditor() {
+      document.getElementById('testimonial-editor-card').style.display = 'none';
+      document.getElementById('testimonial-form').reset();
+    }
+
+    function editTestimonial(id) {
+      const tests = getTestimonials();
+      const t = tests.find(item => item.id === id);
+      if (!t) return;
+
+      document.getElementById('testimonial-edit-id').value = t.id;
+      document.getElementById('testimonial-author').value = t.author;
+      document.getElementById('testimonial-role').value = t.role;
+      document.getElementById('testimonial-quote').value = t.quote;
+      document.getElementById('testimonial-color').value = t.colorClass || 'sticky-yellow';
+
+      document.getElementById('testimonial-form-heading').textContent = 'Edit Endorsement: ' + t.author;
+      document.getElementById('testimonial-editor-card').style.display = 'block';
+      document.getElementById('testimonial-editor-card').scrollIntoView({ behavior: 'smooth' });
+      showAdminToast('✎ Editing endorsement from: ' + t.author);
+    }
+
+    function saveTestimonialForm() {
+      const id = document.getElementById('testimonial-edit-id').value;
+      const author = document.getElementById('testimonial-author').value.trim();
+      const role = document.getElementById('testimonial-role').value.trim();
+      const quote = document.getElementById('testimonial-quote').value.trim();
+      const colorClass = document.getElementById('testimonial-color').value;
+
+      const payload = { author, role, quote, colorClass };
+      if (id) payload.id = id;
+
+      saveTestimonial(payload);
+      closeTestimonialEditor();
+      loadAllData();
+      showAdminToast(id ? '✦ Endorsement updated!' : '✦ New endorsement added!');
+    }
+
+    function removeTestimonial(id) {
+      const backup = [...getTestimonials()];
+      const target = backup.find(t => t.id === id);
+      deleteTestimonial(id);
+      loadAllData();
+      showAdminToast(`🗑 Deleted endorsement by "${target ? target.author : id}"`, () => {
+        localStorage.setItem(TESTIMONIALS_STORAGE_KEY, JSON.stringify(backup));
+        loadAllData();
+        showAdminToast('✦ Endorsement restored!');
+      });
+    }
+
+    /* ----------------------------------------------------------------------
+       4. PROFILE & BIO (EDIT)
+       ---------------------------------------------------------------------- */
+    function renderProfileForm() {
+      const p = getProfileData();
+      document.getElementById('profile-tagline').value = p.tagline || '';
+      document.getElementById('profile-role').value = p.roleBadge || '';
+      document.getElementById('profile-email').value = p.email || '';
+      document.getElementById('profile-bio-1').value = p.bioP1 || '';
+      document.getElementById('profile-bio-2').value = p.bioP2 || '';
+      document.getElementById('profile-bio-3').value = p.bioP3 || '';
+    }
+
+    function saveProfileForm() {
+      const tagline = document.getElementById('profile-tagline').value.trim();
+      const roleBadge = document.getElementById('profile-role').value.trim();
+      const email = document.getElementById('profile-email').value.trim();
+      const bioP1 = document.getElementById('profile-bio-1').value.trim();
+      const bioP2 = document.getElementById('profile-bio-2').value.trim();
+      const bioP3 = document.getElementById('profile-bio-3').value.trim();
+
+      saveProfileData({ tagline, roleBadge, email, bioP1, bioP2, bioP3 });
+      showAdminToast('✦ Profile & Bio saved! Synced with your homepage.');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+/* ==========================================================================
+   RIZZ AI — SMALL MOVING ROBOT PET & VOICE/CHAT ASSISTANT (CHATGPT + SIRI + GEMINI)
+   ========================================================================== */
+
+:root {
+  --ai-grad-gemini: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 35%, #EC4899 70%, #10B981 100%);
+  --ai-grad-siri: conic-gradient(from 0deg, #38BDF8, #818CF8, #C084FC, #F43F5E, #FBBF24, #34D399, #38BDF8);
+}
+
+/* Floating Container (Tucked neatly in Bottom-Left margin) */
+.ai-pet-widget {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 9995;
+  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+  user-select: none;
+}
+
+/* Greeting Speech Bubble */
+.ai-pet-speech-bubble {
+  position: absolute;
+  bottom: 64px;
+  left: 0;
+  background: #FFFFFF;
+  color: #18181B;
+  border: 2px solid #18181B;
+  border-radius: 14px 14px 14px 4px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0px #18181B;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transform-origin: bottom left;
+  animation: aiBubbleFloat 3s ease-in-out infinite, rizzPatrolTranslate 14s ease-in-out infinite;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ai-pet-widget:hover .ai-pet-speech-bubble,
+.ai-pet-widget.is-open .ai-pet-speech-bubble {
+  animation-play-state: running, paused;
+}
+
+.ai-pet-speech-bubble.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8) translateY(10px);
+}
+
+.ai-pet-speech-bubble .bubble-close {
+  margin-left: 0.3rem;
+  font-size: 0.72rem;
+  color: #71717A;
+  padding: 0 2px;
+}
+
+.ai-pet-speech-bubble .bubble-close:hover {
+  color: #EF4444;
+}
+
+@keyframes aiBubbleFloat {
+  0%, 100% { margin-bottom: 0px; }
+  50% { margin-bottom: 5px; }
+}
+
+/* Moving Small Robot Trigger (Calm corner motion so it never disturbs reading) */
+.ai-pet-Launcher {
+  position: relative;
+  width: 48px;
+  height: 54px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  animation: rizzPatrolMove 6s ease-in-out infinite;
+  transition: filter 0.25s ease, transform 0.25s ease;
+}
+
+.ai-pet-widget:hover .ai-pet-Launcher,
+.ai-pet-widget.is-open .ai-pet-Launcher {
+  animation-play-state: paused;
+}
+
+.ai-pet-Launcher:hover {
+  filter: drop-shadow(0 6px 14px rgba(139, 92, 246, 0.55));
+}
+
+/* Gentle In-Corner Motion (Never crosses over page text) */
+@keyframes rizzPatrolMove {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  25%      { transform: translate(5px, -3px) rotate(2deg); }
+  50%      { transform: translate(8px, 0px) rotate(0deg); }
+  75%      { transform: translate(3px, -2px) rotate(-2deg); }
+}
+
+@keyframes rizzPatrolTranslate {
+  0%, 100% { transform: translateX(0px); }
+  50%      { transform: translateX(8px); }
+}
+
+/* Soft Scrapbook Paper Shadow Under Robot (Matches Theme) */
+.ai-pet-aura-ring {
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(24, 24, 27, 0.16);
+  z-index: -1;
+  filter: blur(2px);
+  opacity: 0.85;
+  animation: aiAuraPulse 1.4s ease-in-out infinite alternate;
+}
+
+.ai-pet-widget.is-listening .ai-pet-aura-ring,
+.ai-pet-widget.is-speaking .ai-pet-aura-ring {
+  width: 42px;
+  height: 9px;
+  background: rgba(251, 191, 36, 0.55);
+  filter: blur(4px);
+  opacity: 1;
+}
+
+@keyframes aiAuraPulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(0.95); }
+  50% { opacity: 0.9; transform: translateX(-50%) scale(1.12); }
+}
+
+/* Small Full-Body Moving Robot SVG */
+.ai-pet-svg {
+  width: 46px;
+  height: 52px;
+  overflow: visible;
+  filter: drop-shadow(2px 3px 0px rgba(24, 24, 27, 0.18));
+}
+
+.rizz-robot-body-bob {
+  animation: rizzBodyBob 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes rizzBodyBob {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-2px); }
+}
+
+.rizz-leg-left {
+  transform-origin: 41px 78px;
+  animation: rizzLegWalk 1.4s ease-in-out infinite alternate;
+}
+
+.rizz-leg-right {
+  transform-origin: 59px 78px;
+  animation: rizzLegWalk 1.4s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes rizzLegWalk {
+  0% { transform: rotate(-7deg); }
+  100% { transform: rotate(7deg); }
+}
+
+.rizz-arm-left {
+  transform-origin: 27px 58px;
+  animation: rizzArmWave 1.4s ease-in-out infinite alternate-reverse;
+}
+
+.rizz-arm-right {
+  transform-origin: 73px 58px;
+  animation: rizzArmWave 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes rizzArmWave {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(10deg); }
+}
+
+.ai-pet-eye-pupil {
+  transition: transform 0.08s ease-out;
+}
+
+.ai-pet-eyelids {
+  transform-origin: center;
+  animation: aiPetBlink 4.5s infinite;
+}
+
+@keyframes aiPetBlink {
+  0%, 94%, 98%, 100% { transform: scaleY(0); }
+  96% { transform: scaleY(1); }
+}
+
+.ai-pet-antenna-star {
+  transform-origin: 50px 8px;
+  animation: aiStarTwinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes aiStarTwinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.22) rotate(18deg); }
+}
+
+/* Mouth animations for speaking/happy */
+.ai-pet-widget.is-speaking .ai-pet-mouth {
+  animation: aiMouthTalk 0.28s ease-in-out infinite alternate;
+  transform-origin: 50px 44px;
+}
+
+@keyframes aiMouthTalk {
+  0% { transform: scaleY(0.7); }
+  100% { transform: scaleY(1.65); }
+}
+
+/* Status Badge Dot on Pet */
+.ai-pet-status-dot {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 8px #10B981;
+}
+
+/* ==========================================================================
+   CHATGPT / GEMINI / SIRI CONVERSATION PANEL
+   ========================================================================== */
+.ai-pet-panel {
+  position: absolute;
+  bottom: 72px;
+  left: 0;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 520px;
+  max-height: calc(100vh - 120px);
+  background-color: #FDFBF7;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+  border: 2.5px solid #18181B;
+  border-radius: 18px;
+  box-shadow: 6px 8px 0px #18181B, 0 20px 45px rgba(24, 24, 27, 0.14);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom left;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.88) translateY(20px);
+  transition: opacity 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-pet-widget.is-open .ai-pet-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+}
+
+/* Top Header with Warm Scrapbook Stationery Accent */
+.ai-panel-header {
+  background: #FFFFFF;
+  border-bottom: 2px dashed rgba(24, 24, 27, 0.18);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.ai-panel-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FBBF24 0%, #F43F5E 35%, #3B82F6 70%, #10B981 100%);
+}
+
+.ai-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ai-header-mini-pet {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #FEF9C3;
+  border: 1.5px solid #18181B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.ai-header-mini-pet:hover {
+  transform: rotate(12deg) scale(1.1);
+}
+
+.ai-header-title {
+  font-family: var(--font-cutout, 'Fredoka', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #18181B;
+  line-height: 1.1;
+}
+
+.ai-header-subtitle {
+  font-family: var(--font-mono, 'Space Mono', monospace);
+  font-size: 0.66rem;
+  color: #10B981;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ai-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ai-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #18181B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-icon-btn:hover {
+  background: #FEF08A;
+  border-color: #18181B;
+  transform: translateY(-1px);
+}
+
+.ai-icon-btn.is-active {
+  background: #DBEAFE;
+  border-color: #2563EB;
+  color: #1D4ED8;
+}
+
+/* Interactive Voice Banner (Warm Sticky-Note Scrapbook Style) */
+.ai-siri-orb-banner {
+  background: #FEF9C3;
+  color: #18181B;
+  padding: 0.65rem 1rem;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 2px dashed rgba(24, 24, 27, 0.25);
+}
+
+.ai-pet-widget.is-listening .ai-siri-orb-banner,
+.ai-pet-widget.is-speaking .ai-siri-orb-banner {
+  display: flex;
+}
+
+.siri-wave-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
+
+.siri-wave-bars span {
+  display: inline-block;
+  width: 3.5px;
+  height: 6px;
+  border-radius: 4px;
+  background: #2563EB;
+  animation: siriWavePulse 0.6s ease-in-out infinite alternate;
+}
+
+.siri-wave-bars span:nth-child(2) { animation-delay: 0.12s; background: #F43F5E; }
+.siri-wave-bars span:nth-child(3) { animation-delay: 0.24s; background: #10B981; }
+.siri-wave-bars span:nth-child(4) { animation-delay: 0.36s; background: #F59E0B; }
+.siri-wave-bars span:nth-child(5) { animation-delay: 0.48s; background: #8B5CF6; }
+
+@keyframes siriWavePulse {
+  0% { height: 5px; opacity: 0.6; }
+  100% { height: 20px; opacity: 1; }
+}
+
+.siri-orb-status-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #18181B;
+  flex: 1;
+}
+
+/* Messages Stream Area (Transparent over Graph Paper Panel) */
+.ai-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: transparent;
+}
+
+.ai-msg-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-end;
+  max-width: 90%;
+}
+
+.ai-msg-row.user-msg {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.ai-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #18181B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ai-msg-bubble {
+  padding: 0.7rem 0.95rem;
+  border-radius: 14px;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #18181B;
+  border: 1.5px solid #18181B;
+  box-shadow: 2px 3px 0px rgba(24, 24, 27, 0.12);
+  word-wrap: break-word;
+}
+
+.ai-msg-row.bot-msg .ai-msg-bubble {
+  background: #FFFFFF;
+  border-bottom-left-radius: 4px;
+}
+
+.ai-msg-row.user-msg .ai-msg-bubble {
+  background: #FEF08A;
+  border-bottom-right-radius: 4px;
+  font-weight: 600;
+}
+
+.ai-msg-bubble strong {
+  color: #2563EB;
+}
+
+.ai-msg-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  background: #18181B;
+  color: #FFFFFF !important;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ai-msg-action-btn:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+}
+
+/* Quick Suggestion Chips Bar */
+.ai-quick-chips {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.55rem 0.9rem;
+  background: #F8FAFC;
+  border-top: 1px dashed #CBD5E1;
+  scrollbar-width: none;
+}
+
+.ai-quick-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.ai-chip-btn {
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #18181B;
+  border: 1.5px solid #CBD5E1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-chip-btn:hover {
+  background: #DBEAFE;
+  border-color: #2563EB;
+  color: #1D4ED8;
+  transform: translateY(-1px);
+}
+
+/* Input Bar with Mic & Send */
+.ai-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.85rem;
+  background: #FFFFFF;
+  border-top: 2px solid #18181B;
+}
+
+.ai-chat-input {
+  flex: 1;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 999px;
+  padding: 0.52rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #18181B;
+  background: #F8FAFC;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ai-chat-input:focus {
+  border-color: #2563EB;
+  background: #FFFFFF;
+}
+
+.ai-mic-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #18181B;
+  background: linear-gradient(135deg, #EFF6FF, #F3E8FF);
+  color: #18181B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.ai-mic-btn:hover {
+  background: #DBEAFE;
+  transform: scale(1.08);
+}
+
+.ai-pet-widget.is-listening .ai-mic-btn {
+  background: #EF4444;
+  color: #FFFFFF;
+  border-color: #EF4444;
+  animation: micPulseRing 1.2s infinite;
+}
+
+@keyframes micPulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  100% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+
+.ai-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #18181B;
+  background: #18181B;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.ai-send-btn:hover {
+  background: #2563EB;
+  border-color: #2563EB;
+  transform: scale(1.08);
+}
+
+@media (max-width: 600px) {
+  .ai-pet-widget {
+    bottom: 14px;
+    left: 14px;
+  }
+  .ai-pet-Launcher {
+    width: 48px;
+    height: 54px;
+  }
+  .ai-pet-svg {
+    width: 44px;
+    height: 50px;
+  }
+  .ai-pet-panel {
+    width: calc(100vw - 32px);
+    bottom: 66px;
+  }
+}
+
