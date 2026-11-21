@@ -773,7 +773,7 @@ function initPublicBlogEditor(onSaveCallback) {
               <input type="text" id="pub-blog-readtime" class="admin-input" value="5 min read" required>
             </div>
             <div>
-              <label class="form-label" for="pub-blog-image">Cover Image</label>
+              <label class="form-label" for="pub-blog-image">Cover Image (Preset or Upload up to 5MB)</label>
               <select id="pub-blog-image" class="admin-select">
                 <option value="assets/images/project-2-art.jpg">Campaign Artwork (Orange)</option>
                 <option value="assets/images/project-1-art.jpg">Luxury Branding (Purple)</option>
@@ -782,6 +782,16 @@ function initPublicBlogEditor(onSaveCallback) {
                 <option value="assets/images/project-5-card.jpg">Motion Graphics (Pink)</option>
                 <option value="assets/images/project-6-card.jpg">Studio Showreel (Yellow)</option>
               </select>
+              <input type="hidden" id="pub-blog-image-data" value="">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem; flex-wrap: wrap;">
+                <label class="btn-admin-action" style="cursor: pointer; margin: 0;">
+                  📷 Upload Image (Max 5MB)
+                  <input type="file" id="pub-blog-image-file" accept="image/*" style="display: none;">
+                </label>
+                <button type="button" class="btn-admin-action" id="pub-blog-image-clear" style="display: none;">Clear Upload ✕</button>
+              </div>
+              <div id="pub-blog-image-status" style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 0.3rem;"></div>
+              <img id="pub-blog-image-preview" src="assets/images/project-2-art.jpg" alt="Cover preview" style="margin-top: 0.45rem; width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #E4E4E7;">
             </div>
           </div>
 
@@ -841,13 +851,54 @@ function initPublicBlogEditor(onSaveCallback) {
     document.getElementById('pub-tag-bold').addEventListener('click', () => insertAtCursor('<strong>', '</strong>'));
     document.getElementById('pub-tag-note').addEventListener('click', () => insertAtCursor('<div class="blog-callout-note">', '</div>'));
 
+    const pubFileInput = document.getElementById('pub-blog-image-file');
+    const pubDataInput = document.getElementById('pub-blog-image-data');
+    const pubSelect = document.getElementById('pub-blog-image');
+    const pubClearBtn = document.getElementById('pub-blog-image-clear');
+    const pubStatus = document.getElementById('pub-blog-image-status');
+    const pubPreview = document.getElementById('pub-blog-image-preview');
+
+    pubSelect.addEventListener('change', () => {
+      pubDataInput.value = '';
+      pubClearBtn.style.display = 'none';
+      pubStatus.textContent = '';
+      pubPreview.src = pubSelect.value;
+    });
+
+    pubClearBtn.addEventListener('click', () => {
+      pubDataInput.value = '';
+      pubFileInput.value = '';
+      pubClearBtn.style.display = 'none';
+      pubStatus.textContent = '';
+      pubPreview.src = pubSelect.value;
+    });
+
+    pubFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        pubStatus.style.color = 'var(--ink-muted)';
+        pubStatus.textContent = 'Processing image...';
+        const dataUrl = await window.processPortfolioImageUpload(file);
+        pubDataInput.value = dataUrl;
+        pubPreview.src = dataUrl;
+        pubClearBtn.style.display = 'inline-block';
+        pubStatus.style.color = '#16A34A';
+        pubStatus.textContent = `Uploaded: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+      } catch (err) {
+        pubFileInput.value = '';
+        pubStatus.style.color = '#EF4444';
+        pubStatus.textContent = err.message || 'Could not process image.';
+      }
+    });
+
     document.getElementById('pub-blog-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('pub-blog-id').value.trim();
       const title = document.getElementById('pub-blog-title').value.trim();
       const category = document.getElementById('pub-blog-category').value;
       const readTime = document.getElementById('pub-blog-readtime').value.trim() || '5 min read';
-      const coverImage = document.getElementById('pub-blog-image').value;
+      const coverImage = pubDataInput.value.trim() || document.getElementById('pub-blog-image').value;
       const excerpt = document.getElementById('pub-blog-excerpt').value.trim();
       let content = document.getElementById('pub-blog-content').value.trim();
 
@@ -896,7 +947,13 @@ function initPublicBlogEditor(onSaveCallback) {
       document.getElementById('pub-blog-title').value = post.title || '';
       document.getElementById('pub-blog-category').value = post.category || 'Digital Marketing';
       document.getElementById('pub-blog-readtime').value = post.readTime || '5 min read';
-      document.getElementById('pub-blog-image').value = post.coverImage || 'assets/images/project-2-art.jpg';
+      const imgVal = post.coverImage || 'assets/images/project-2-art.jpg';
+      const isDataImg = imgVal.startsWith('data:image/');
+      document.getElementById('pub-blog-image-data').value = isDataImg ? imgVal : '';
+      document.getElementById('pub-blog-image').value = isDataImg ? 'assets/images/project-2-art.jpg' : imgVal;
+      document.getElementById('pub-blog-image-preview').src = imgVal;
+      document.getElementById('pub-blog-image-clear').style.display = isDataImg ? 'inline-block' : 'none';
+      document.getElementById('pub-blog-image-status').textContent = isDataImg ? 'Using custom uploaded image' : '';
       document.getElementById('pub-blog-excerpt').value = post.excerpt || '';
       document.getElementById('pub-blog-content').value = (post.content || post.excerpt || '').trim();
     } else {
@@ -905,6 +962,10 @@ function initPublicBlogEditor(onSaveCallback) {
       document.getElementById('pub-blog-id').value = '';
       document.getElementById('pub-blog-readtime').value = '5 min read';
       document.getElementById('pub-blog-image').value = 'assets/images/project-2-art.jpg';
+      document.getElementById('pub-blog-image-data').value = '';
+      document.getElementById('pub-blog-image-preview').src = 'assets/images/project-2-art.jpg';
+      document.getElementById('pub-blog-image-clear').style.display = 'none';
+      document.getElementById('pub-blog-image-status').textContent = '';
     }
 
     modal.classList.add('open');
@@ -912,3 +973,54 @@ function initPublicBlogEditor(onSaveCallback) {
     document.body.style.overflow = 'hidden';
   };
 }
+
+/**
+ * Shared 5 MB image upload + optimization helper for Blog & Project editors.
+ * Validates file type and <= 5 MB size, then scales large photos for reliable localStorage persistence.
+ */
+window.processPortfolioImageUpload = function (file) {
+  const MAX_BYTES = 5 * 1024 * 1024;
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      reject(new Error('Please select a valid image file (JPG, PNG, WebP, GIF).'));
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      reject(new Error('Image exceeds the 5 MB limit. Please choose a file under 5 MB.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read the selected image file.'));
+    reader.onload = () => {
+      const rawDataUrl = reader.result;
+      if (typeof rawDataUrl !== 'string') {
+        reject(new Error('Invalid image data.'));
+        return;
+      }
+      // Keep small images or SVGs untouched
+      if (rawDataUrl.length <= 380000 || file.type === 'image/svg+xml') {
+        resolve(rawDataUrl);
+        return;
+      }
+      const img = new Image();
+      img.onerror = () => resolve(rawDataUrl);
+      img.onload = () => {
+        const maxDim = 1400;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = rawDataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+};

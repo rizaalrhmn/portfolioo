@@ -322,15 +322,21 @@
                 </div>
 
                 <div>
-                  <label class="form-label" for="blog-image">Cover Artwork</label>
-                  <input type="text" id="blog-image" class="admin-input" value="assets/images/project-2-art.jpg" required>
+                  <label class="form-label" for="blog-image">Cover Artwork (URL or Upload up to 5MB)</label>
+                  <input type="text" id="blog-image" class="admin-input" value="assets/images/project-2-art.jpg" oninput="updateAdminPreview('blog-image', 'blog-image-preview')" required>
                   <div style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem;">
+                    <label class="btn-admin-action" style="cursor: pointer; margin: 0; background: var(--color-pink-soft); color: var(--color-pink); border-color: var(--color-pink);">
+                      📷 Upload (Max 5MB)
+                      <input type="file" id="blog-image-file" accept="image/*" style="display: none;" onchange="handleAdminImageUpload(this, 'blog-image', 'blog-image-preview', 'blog-image-status')">
+                    </label>
                     <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-1-art.jpg')">Mihdab</button>
                     <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-2-art.jpg')">RPM</button>
                     <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-3-art.jpg')">Zviz</button>
                     <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-4-card.jpg')">Aura</button>
                     <button type="button" class="btn-admin-action" onclick="setBlogImage('assets/images/project-5-card.jpg')">Kinetix</button>
                   </div>
+                  <div id="blog-image-status" style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 0.3rem;"></div>
+                  <img id="blog-image-preview" src="assets/images/project-2-art.jpg" alt="Blog cover preview" style="margin-top: 0.45rem; width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #CBD5E1;">
                 </div>
 
                 <div>
@@ -469,15 +475,21 @@
                 </div>
 
                 <div>
-                  <label class="form-label" for="project-image">Artwork Image File</label>
-                  <input type="text" id="project-image" class="admin-input" value="assets/images/project-1-art.jpg" required>
+                  <label class="form-label" for="project-image">Artwork Image (URL or Upload up to 5MB)</label>
+                  <input type="text" id="project-image" class="admin-input" value="assets/images/project-1-art.jpg" oninput="updateAdminPreview('project-image', 'project-image-preview')" required>
                   <div style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem;">
+                    <label class="btn-admin-action" style="cursor: pointer; margin: 0; background: var(--color-pink-soft); color: var(--color-pink); border-color: var(--color-pink);">
+                      📷 Upload (Max 5MB)
+                      <input type="file" id="project-image-file" accept="image/*" style="display: none;" onchange="handleAdminImageUpload(this, 'project-image', 'project-image-preview', 'project-image-status')">
+                    </label>
                     <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-1-art.jpg')">Art 1</button>
                     <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-2-art.jpg')">Art 2</button>
                     <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-3-art.jpg')">Art 3</button>
                     <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-4-card.jpg')">Card 4</button>
                     <button type="button" class="btn-admin-action" onclick="setProjImage('assets/images/project-5-card.jpg')">Card 5</button>
                   </div>
+                  <div id="project-image-status" style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 0.3rem;"></div>
+                  <img id="project-image-preview" src="assets/images/project-1-art.jpg" alt="Project artwork preview" style="margin-top: 0.45rem; width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #CBD5E1;">
                 </div>
 
                 <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
@@ -962,6 +974,9 @@
 
     function setBlogImage(path) {
       document.getElementById('blog-image').value = path;
+      updateAdminPreview('blog-image', 'blog-image-preview');
+      const st = document.getElementById('blog-image-status');
+      if (st) st.textContent = '';
     }
 
     function insertTagBlog(openTag, closeTag) {
@@ -1087,6 +1102,44 @@
 
     function setProjImage(path) {
       document.getElementById('project-image').value = path;
+      updateAdminPreview('project-image', 'project-image-preview');
+      const st = document.getElementById('project-image-status');
+      if (st) st.textContent = '';
+    }
+
+    function updateAdminPreview(inputId, previewId) {
+      const inp = document.getElementById(inputId);
+      const prev = document.getElementById(previewId);
+      if (inp && prev && inp.value.trim()) {
+        prev.src = inp.value.trim();
+      }
+    }
+
+    async function handleAdminImageUpload(fileInput, targetInputId, previewId, statusId) {
+      const file = fileInput && fileInput.files && fileInput.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById(statusId);
+      const targetEl = document.getElementById(targetInputId);
+      const previewEl = document.getElementById(previewId);
+      try {
+        if (statusEl) {
+          statusEl.style.color = 'var(--ink-muted)';
+          statusEl.textContent = 'Processing image...';
+        }
+        const dataUrl = await window.processPortfolioImageUpload(file);
+        if (targetEl) targetEl.value = dataUrl;
+        if (previewEl) previewEl.src = dataUrl;
+        if (statusEl) {
+          statusEl.style.color = '#16A34A';
+          statusEl.textContent = `Uploaded: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+        }
+      } catch (err) {
+        fileInput.value = '';
+        if (statusEl) {
+          statusEl.style.color = '#EF4444';
+          statusEl.textContent = err.message || 'Could not upload image.';
+        }
+      }
     }
 
     /* ----------------------------------------------------------------------
