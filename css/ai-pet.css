@@ -646,3 +646,64 @@
   }
 }
 
+/* Dark Mode for Rizz AI Widget (preserves robot SVG colors) */
+[data-theme="dark"] .ai-pet-speech-bubble {
+  background: #222630;
+  color: #F5F3EE;
+  border-color: #414653;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .ai-pet-panel {
+  background-color: #191C23;
+  border-color: #414653;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.65), 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .ai-pet-header {
+  background: #222630;
+  border-bottom-color: #414653;
+  color: #F5F3EE;
+}
+
+[data-theme="dark"] .ai-pet-chat {
+  background: #111318;
+}
+
+[data-theme="dark"] .ai-msg-bot {
+  background: #222630;
+  color: #F5F3EE;
+  border-color: #414653;
+}
+
+[data-theme="dark"] .ai-pet-quick-chips {
+  background: #191C23;
+  border-top-color: #414653;
+}
+
+[data-theme="dark"] .ai-quick-chip {
+  background: #252A34;
+  color: #F5F3EE;
+  border-color: #414653;
+}
+
+[data-theme="dark"] .ai-quick-chip:hover {
+  background: #2D3340;
+  border-color: var(--color-pink, #FF527B);
+}
+
+[data-theme="dark"] .ai-pet-footer {
+  background: #222630;
+  border-top-color: #414653;
+}
+
+[data-theme="dark"] .ai-pet-input {
+  background: #111318;
+  color: #F5F3EE;
+  border-color: #414653;
+}
+
+[data-theme="dark"] .ai-pet-input::placeholder {
+  color: #9CA3AF;
+}
+

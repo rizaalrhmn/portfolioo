@@ -622,3 +622,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Dark Mode for Blog & Admin Surfaces */
+[data-theme="dark"] .blog-hero-sheet,
+[data-theme="dark"] .blog-card,
+[data-theme="dark"] .article-modal-window,
+[data-theme="dark"] .admin-card,
+[data-theme="dark"] .admin-login-box,
+[data-theme="dark"] .blog-editor-card {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-primary);
+}
+
+[data-theme="dark"] .scrapbook-doodle-filler-card {
+  background-color: var(--bg-paper-aged);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  border-color: #414653;
+  color: var(--ink-primary);
+}
+
+[data-theme="dark"] .blog-tag-pill {
+  background-color: var(--bg-paper-aged);
+  color: var(--ink-secondary);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .blog-search-input,
+[data-theme="dark"] .filter-pill {
+  background-color: var(--bg-paper-aged);
+  color: var(--ink-primary);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .filter-pill.active {
+  background-color: var(--color-pink);
+  border-color: var(--color-pink);
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .btn-admin-action {
+  background-color: var(--bg-paper-aged);
+  color: var(--ink-primary);
+  border-color: #414653;
+}

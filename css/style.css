@@ -2971,76 +2971,88 @@ button {
 }
 
 [data-theme="dark"] {
-  --bg-canvas: #121216;
-  --bg-canvas-warm: #18181F;
-  --bg-paper: #1C1C24;
-  --bg-paper-aged: #22222C;
-  --bg-kraft: #262632;
+  --bg-canvas: #111318;
+  --bg-canvas-warm: #191C23;
+  --bg-paper: #222630;
+  --bg-paper-aged: #252A34;
+  --bg-kraft: #2A2F3B;
 
-  --grid-line: rgba(255, 255, 255, 0.06);
-  --notebook-line: rgba(147, 197, 253, 0.14);
-  --notebook-margin: rgba(248, 113, 113, 0.35);
+  --grid-line: #394352;
+  --notebook-line: rgba(119, 165, 255, 0.16);
+  --notebook-margin: rgba(255, 82, 123, 0.38);
 
-  --color-pink: #FB7185;
-  --color-pink-soft: rgba(244, 63, 94, 0.18);
-  --color-blue: #60A5FA;
-  --color-blue-soft: rgba(59, 130, 246, 0.2);
-  --color-yellow: #FBBF24;
-  --color-yellow-soft: rgba(245, 158, 11, 0.2);
+  --color-pink: #FF527B;
+  --color-pink-soft: rgba(255, 82, 123, 0.18);
+  --color-blue: #77A5FF;
+  --color-blue-soft: rgba(119, 165, 255, 0.18);
+  --color-yellow: #FFD66E;
+  --color-yellow-soft: rgba(255, 214, 110, 0.18);
   --color-purple: #A78BFA;
-  --color-purple-soft: rgba(139, 92, 246, 0.2);
+  --color-purple-soft: rgba(167, 139, 250, 0.2);
   --color-mint: #34D399;
-  --color-mint-soft: rgba(16, 185, 129, 0.18);
+  --color-mint-soft: rgba(52, 211, 153, 0.18);
   --color-orange: #FB923C;
   --color-teal: #2DD4BF;
 
-  --ink-primary: #F4F4F5;
-  --ink-secondary: #D4D4D8;
-  --ink-muted: #A1A1AA;
-  --ink-light: #71717A;
+  --ink-primary: #F5F3EE;
+  --ink-secondary: #B7BBC6;
+  --ink-muted: #9CA3AF;
+  --ink-light: #6B7280;
 
-  --washi-cream: rgba(63, 63, 70, 0.72);
-  --washi-yellow: rgba(234, 179, 8, 0.28);
-  --washi-pink: rgba(244, 63, 94, 0.28);
-  --washi-blue: rgba(59, 130, 246, 0.28);
+  --washi-cream: rgba(65, 70, 83, 0.72);
+  --washi-yellow: rgba(255, 214, 110, 0.24);
+  --washi-pink: rgba(255, 82, 123, 0.24);
+  --washi-blue: rgba(119, 165, 255, 0.24);
 
-  --shadow-paper: 0 4px 16px rgba(0, 0, 0, 0.38), 0 1px 3px rgba(0, 0, 0, 0.28);
-  --shadow-paper-float: 0 12px 28px -6px rgba(0, 0, 0, 0.48), 0 4px 10px rgba(0, 0, 0, 0.28);
-  --shadow-paper-tilt: 0 16px 36px -8px rgba(0, 0, 0, 0.52), 0 6px 14px rgba(0, 0, 0, 0.3);
+  --shadow-paper: 0 4px 16px rgba(0, 0, 0, 0.42), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-paper-float: 0 12px 28px -6px rgba(0, 0, 0, 0.52), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-paper-tilt: 0 16px 36px -8px rgba(0, 0, 0, 0.56), 0 6px 14px rgba(0, 0, 0, 0.32);
 
   color-scheme: dark;
 }
 
-body,
-.scrapbook-header,
-.grid-paper,
-.ruled-paper,
-.hero-paper-frame,
-.resume-card,
-.specialty-card,
-.studio-artboard,
-.scrapbook-project-card,
-.blog-card,
-.testimonial-card,
-.contact-card-frame,
-.modal-window,
-.scrapbook-footer {
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+/* Accessible keyboard focus ring */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 2px;
 }
 
+/* 1. Global & Header */
+[data-theme="dark"] html,
 [data-theme="dark"] body {
   background-color: var(--bg-canvas);
   color: var(--ink-primary);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
 [data-theme="dark"] .scrapbook-header {
-  background: rgba(18, 18, 22, 0.9);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 19, 24, 0.92);
+  border-bottom-color: #414653;
 }
 
 [data-theme="dark"] .scrapbook-header.scrolled {
-  background: rgba(18, 18, 22, 0.96);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  background: rgba(17, 19, 24, 0.97);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .header-meta-bar {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .mobile-nav-toggle span {
+  background-color: var(--ink-primary);
+}
+
+@media (max-width: 768px) {
+  [data-theme="dark"] .nav-links-list {
+    background-color: var(--bg-canvas);
+    border-bottom-color: #414653;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.45);
+  }
 }
 
 /* Inverted dark-on-light buttons & badges in Dark Mode */
@@ -3053,7 +3065,7 @@ body,
 [data-theme="dark"] .blog-badge-category,
 [data-theme="dark"] .btn-admin-action:hover {
   background-color: var(--ink-primary);
-  color: #121216;
+  color: #111318;
   border-color: var(--ink-primary);
 }
 
@@ -3063,100 +3075,45 @@ body,
   color: #FFFFFF;
 }
 
-/* Paper, Cards, Modals & Containers */
-[data-theme="dark"] .grid-paper,
-[data-theme="dark"] .ruled-paper {
-  background-color: var(--bg-paper);
-  border-color: rgba(255, 255, 255, 0.1);
+/* 2. Hero */
+[data-theme="dark"] .hero-bg-blobs .blob-pastel {
+  opacity: 0.14;
 }
 
-[data-theme="dark"] .hero-paper-frame,
-[data-theme="dark"] .hero-role-badge,
-[data-theme="dark"] .hero-tool-chip,
-[data-theme="dark"] .btn-scrapbook-secondary,
-[data-theme="dark"] .resume-card,
-[data-theme="dark"] .resume-timeline-card,
-[data-theme="dark"] .skill-tag-pill,
-[data-theme="dark"] .specialty-card,
-[data-theme="dark"] .specialty-icon-box,
-[data-theme="dark"] .studio-artboard,
-[data-theme="dark"] .studio-dock-pill,
-[data-theme="dark"] .studio-info-bar,
-[data-theme="dark"] .snake-icon-node,
-[data-theme="dark"] .scrapbook-project-card,
-[data-theme="dark"] .card-content-body,
-[data-theme="dark"] .project-card-body,
-[data-theme="dark"] .project-tag-pill,
-[data-theme="dark"] .modal-window,
-[data-theme="dark"] .modal-close-btn,
-[data-theme="dark"] .article-modal-window,
-[data-theme="dark"] .blog-card,
-[data-theme="dark"] .blog-filler-card,
-[data-theme="dark"] .blog-hero-sheet,
-[data-theme="dark"] .blog-filter-bar,
-[data-theme="dark"] .testimonial-card,
-[data-theme="dark"] .contact-card-frame,
-[data-theme="dark"] .contact-form-notepad,
-[data-theme="dark"] .contact-info-card,
-[data-theme="dark"] .contact-social-pill,
-[data-theme="dark"] .scrapbook-footer {
-  background-color: var(--bg-paper);
-  color: var(--ink-primary);
-  border-color: rgba(255, 255, 255, 0.12);
+[data-theme="dark"] .torn-paper-wrapper {
+  background-color: var(--bg-canvas-warm);
+  border-color: #414653;
 }
 
-/* Hardcoded Pastel Badges & Sticky Notes */
-[data-theme="dark"] .badge-purple,
-[data-theme="dark"] .hero-sticker-tag {
-  background-color: rgba(139, 92, 246, 0.22);
-  color: #DDD6FE;
-  border-color: rgba(167, 139, 250, 0.35);
-}
-
-[data-theme="dark"] .badge-yellow {
-  background-color: rgba(245, 158, 11, 0.22);
-  color: #FDE68A;
-  border-color: rgba(251, 191, 36, 0.35);
-}
-
-[data-theme="dark"] .resume-card.highlight-blue,
-[data-theme="dark"] .highlight-blue {
-  background-color: rgba(59, 130, 246, 0.16) !important;
-  color: var(--ink-primary);
-}
-
-[data-theme="dark"] .testimonial-sticky-note,
-[data-theme="dark"] .sticky-note-yellow {
-  background-color: #2D2716;
-  color: #FEF3C7;
-  border-color: rgba(251, 191, 36, 0.28);
-}
-
-[data-theme="dark"] .testimonial-sticky-note *,
-[data-theme="dark"] .sticky-note-yellow * {
-  color: #FEF3C7;
-}
-
-/* Inputs, Search, Filter Pills */
-[data-theme="dark"] .contact-input,
-[data-theme="dark"] .contact-textarea,
-[data-theme="dark"] .blog-search-input,
-[data-theme="dark"] .filter-pill {
+[data-theme="dark"] .hero-grid-sheet,
+[data-theme="dark"] .grid-paper {
   background-color: var(--bg-paper-aged);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .hero-role-badge {
+  background-color: rgba(255, 214, 110, 0.14);
+  border-color: var(--color-yellow);
   color: var(--ink-primary);
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
-[data-theme="dark"] .contact-input::placeholder,
-[data-theme="dark"] .contact-textarea::placeholder,
-[data-theme="dark"] .blog-search-input::placeholder {
-  color: var(--ink-muted);
+[data-theme="dark"] .scrapbook-stat-counter-chip {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-primary);
 }
 
-[data-theme="dark"] .filter-pill.active {
-  background-color: var(--color-pink);
-  color: #FFFFFF;
-  border-color: var(--color-pink);
+/* 3. About Me & Ruled Paper */
+[data-theme="dark"] .scrapbook-about-resume {
+  background-color: var(--bg-canvas);
+  border-top-color: #414653;
+  border-bottom-color: #414653;
+}
+
+[data-theme="dark"] .ruled-paper,
+[data-theme="dark"] .about-notepad-card {
+  background-color: var(--bg-paper-aged);
+  border-color: #414653;
 }
 
 [data-theme="dark"] .signature-stamp {
@@ -3167,39 +3124,211 @@ body,
   border-top-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Rizzy AI Pet Widget */
-[data-theme="dark"] .ai-pet-bubble,
-[data-theme="dark"] .ai-pet-drawer {
-  background-color: var(--bg-paper);
-  color: var(--ink-primary);
-  border-color: rgba(255, 255, 255, 0.16);
+/* 4. Resume, Software Stack & Skills */
+[data-theme="dark"] .resume-item {
+  border-left-color: #414653;
 }
 
-[data-theme="dark"] .ai-pet-messages {
+[data-theme="dark"] .software-snake-card {
+  background-color: var(--bg-paper-aged);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
+  border-color: #414653;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.55), var(--shadow-paper-float);
+}
+
+[data-theme="dark"] .snake-badge-pill {
+  background-color: rgba(52, 211, 153, 0.18);
+  color: #6EE7B7;
+  border-color: #34D399;
+}
+
+[data-theme="dark"] .snake-icon-node {
+  background-color: #2D3340;
+  border-color: #414653;
+}
+
+[data-theme="dark"] .snake-track-footer {
+  border-top-color: #414653;
+}
+
+[data-theme="dark"] .software-row {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .software-row:hover,
+[data-theme="dark"] .software-row.is-active {
+  background-color: rgba(119, 165, 255, 0.18) !important;
+  border-color: var(--color-blue) !important;
+  color: var(--ink-primary);
+}
+
+[data-theme="dark"] .skill-chip {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .skill-chip:hover {
+  background-color: rgba(255, 214, 110, 0.16);
+  border-color: var(--color-yellow);
+  color: var(--ink-primary);
+}
+
+/* 5. Specialties, Creative Lab & Projects */
+[data-theme="dark"] .categories-inner-card,
+[data-theme="dark"] .scrapbook-project-card,
+[data-theme="dark"] .card-content-body,
+[data-theme="dark"] .project-card-body {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-primary);
+}
+
+[data-theme="dark"] .category-bubbly-item {
+  background-color: var(--bg-paper-aged);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .category-bubbly-item:hover {
+  background-color: var(--bg-kraft);
+  border-color: var(--color-blue);
+}
+
+[data-theme="dark"] .creative-studio-artboard {
+  background-color: var(--bg-paper-aged);
+  background-image: radial-gradient(#394352 1.2px, transparent 1.2px);
+  border-color: #414653;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.55), var(--shadow-paper-float);
+}
+
+[data-theme="dark"] .artboard-header-bar {
+  border-bottom-color: #414653;
+}
+
+[data-theme="dark"] .project-tag-pill,
+[data-theme="dark"] .btn-scrapbook-secondary,
+[data-theme="dark"] .resume-card,
+[data-theme="dark"] .resume-timeline-card,
+[data-theme="dark"] .skill-tag-pill,
+[data-theme="dark"] .specialty-card,
+[data-theme="dark"] .specialty-icon-box,
+[data-theme="dark"] .studio-dock-pill,
+[data-theme="dark"] .studio-info-bar {
+  background-color: var(--bg-paper);
+  color: var(--ink-primary);
+  border-color: #414653;
+}
+
+/* 6. Sticky Praise Testimonials */
+[data-theme="dark"] .scrapbook-testimonials {
+  border-top-color: #414653;
+  border-bottom-color: #414653;
+}
+
+[data-theme="dark"] .sticky-yellow {
+  background-color: #332B14;
+  border: 1px solid rgba(255, 214, 110, 0.35);
+}
+
+[data-theme="dark"] .sticky-pink {
+  background-color: #361C28;
+  border: 1px solid rgba(255, 82, 123, 0.35);
+}
+
+[data-theme="dark"] .sticky-blue {
+  background-color: #172A3E;
+  border: 1px solid rgba(119, 165, 255, 0.35);
+}
+
+[data-theme="dark"] .sticky-note-author {
+  border-top-color: rgba(255, 255, 255, 0.16);
+}
+
+/* 7. Contact & Footer */
+[data-theme="dark"] .scrapbook-contact {
   background-color: var(--bg-canvas);
 }
 
-[data-theme="dark"] .ai-pet-msg-bot {
-  background-color: var(--bg-paper-aged);
-  color: var(--ink-primary);
-  border-color: rgba(255, 255, 255, 0.12);
+[data-theme="dark"] .contact-card-frame {
+  background-color: var(--bg-canvas-warm);
+  border-color: #414653;
 }
 
-[data-theme="dark"] .ai-pet-input-row {
+[data-theme="dark"] .contact-form-notepad {
+  background-color: var(--bg-paper-aged);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .contact-input,
+[data-theme="dark"] .contact-textarea {
+  background-color: var(--bg-canvas-warm);
+  color: var(--ink-primary);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-textarea:focus {
   background-color: var(--bg-paper);
-  border-top-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-pink);
 }
 
-[data-theme="dark"] .ai-pet-input {
-  background-color: var(--bg-paper-aged);
-  color: var(--ink-primary);
-  border-color: rgba(255, 255, 255, 0.16);
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .form-textarea::placeholder {
+  color: var(--ink-muted);
 }
 
-[data-theme="dark"] .nav-links-list {
+[data-theme="dark"] .service-check-item {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .service-check-item:has(input:checked) {
+  background-color: rgba(255, 82, 123, 0.2);
+  border-color: var(--color-pink);
+  color: #FF8FA8;
+}
+
+[data-theme="dark"] .scrapbook-footer {
   background-color: var(--bg-canvas);
+  border-top-color: #414653;
 }
 
-[data-theme="dark"] .mobile-nav-toggle span {
-  background-color: var(--ink-primary);
+[data-theme="dark"] .btn-back-top {
+  background-color: var(--bg-paper);
+  border-color: #414653;
+  color: var(--ink-primary);
+}
+
+/* 8. Modals & Game Arcade */
+[data-theme="dark"] .modal-paper-window,
+[data-theme="dark"] .modal-window,
+[data-theme="dark"] .article-modal-window {
+  background-color: var(--bg-paper);
+  color: var(--ink-primary);
+  border-color: #414653;
+}
+
+[data-theme="dark"] .modal-close-btn {
+  background-color: var(--bg-kraft);
+  color: var(--ink-primary);
+  border: 1px solid #414653;
+}
+
+[data-theme="dark"] .modal-meta-box {
+  background-color: var(--bg-canvas-warm);
+  border-color: #414653;
+}
+
+[data-theme="dark"] #game-overlay {
+  background: rgba(17, 19, 24, 0.88) !important;
+}
+
+[data-theme="dark"] #game-overlay-title {
+  color: var(--ink-primary) !important;
 }
