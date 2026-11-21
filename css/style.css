@@ -1799,6 +1799,10 @@ button {
   overflow-x: clip;
 }
 
+.scrapbook-projects[hidden] {
+  display: none;
+}
+
 .projects-header-group {
   text-align: center;
   max-width: 720px;

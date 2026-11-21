@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initDynamicContent();
   initCaseStudyModal();
+  initProjectsSectionVisibility();
   initCreativeStudioInteractivity();
   initSoftwareSnakeTrack();
   initEmailCopy();
@@ -96,6 +97,123 @@ function initMobileMenu() {
       }
     });
   });
+}
+
+/* ==========================================================================
+   2B. PROJECTS SECTION VISIBILITY & NAVIGATION STATE
+   ========================================================================== */
+function initProjectsSectionVisibility() {
+  const projectsSection = document.getElementById('projects');
+  if (!projectsSection) return;
+
+  const header = document.getElementById('site-header');
+  const navMenu = document.getElementById('nav-menu');
+  const toggleBtn = document.getElementById('mobile-toggle');
+
+  function closeMobileDrawer() {
+    if (navMenu && navMenu.classList.contains('open')) {
+      navMenu.classList.remove('open');
+      if (toggleBtn) {
+        toggleBtn.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+      document.body.style.overflow = '';
+    }
+  }
+
+  function scrollToElement(el, instant) {
+    if (!el) return;
+    const headerHeight = header ? header.offsetHeight : 80;
+    const targetTop = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerHeight - 8);
+    window.scrollTo({
+      top: targetTop,
+      behavior: instant ? 'auto' : 'smooth'
+    });
+  }
+
+  function setProjectsVisible(visible) {
+    if (visible) {
+      projectsSection.hidden = false;
+      projectsSection.setAttribute('aria-hidden', 'false');
+      if (typeof window.refreshScrapbookAnimations === 'function') {
+        window.refreshScrapbookAnimations();
+      }
+      requestAnimationFrame(() => {
+        projectsSection.querySelectorAll('.reveal-on-scroll, .reveal-stamp, .reveal-from-left, .reveal-from-right, .reveal-pop')
+          .forEach((el) => el.classList.add('is-revealed'));
+      });
+    } else {
+      projectsSection.hidden = true;
+      projectsSection.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function showProjectsAndScroll(options = {}) {
+    const { updateHistory = true, instant = false } = options;
+    closeMobileDrawer();
+    setProjectsVisible(true);
+    if (updateHistory && window.location.hash !== '#projects') {
+      history.pushState({ section: 'projects' }, '', '#projects');
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToElement(projectsSection, instant);
+      });
+    });
+  }
+
+  // Handle all #projects triggers (top nav, mobile drawer, hero CTA)
+  document.querySelectorAll('a[href="#projects"]').forEach((trigger) => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      showProjectsAndScroll({ updateHistory: true, instant: false });
+    });
+  });
+
+  // Handle other main navigation links: hide Projects again & scroll cleanly
+  document.querySelectorAll('.nav-link[href^="#"], .header-cta-btn[href^="#"]').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (!href || href === '#projects') return;
+
+    link.addEventListener('click', (e) => {
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      closeMobileDrawer();
+      setProjectsVisible(false);
+      if (window.location.hash !== href) {
+        history.pushState({ section: href.slice(1) }, '', href);
+      }
+      requestAnimationFrame(() => {
+        scrollToElement(target, false);
+      });
+    });
+  });
+
+  // Sync state on direct /#projects load, refresh, and browser back/forward
+  function syncFromLocation(isInitialLoad) {
+    const hash = window.location.hash;
+    if (hash === '#projects') {
+      showProjectsAndScroll({ updateHistory: false, instant: isInitialLoad });
+    } else {
+      setProjectsVisible(false);
+      if (!isInitialLoad) {
+        if (hash && hash.startsWith('#')) {
+          const target = document.querySelector(hash);
+          if (target) {
+            requestAnimationFrame(() => scrollToElement(target, false));
+          }
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
+  }
+
+  window.addEventListener('popstate', () => syncFromLocation(false));
+  window.addEventListener('hashchange', () => syncFromLocation(false));
+
+  syncFromLocation(true);
 }
 
 /* ==========================================================================
