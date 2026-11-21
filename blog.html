@@ -84,12 +84,6 @@
           <p class="blog-subtitle-note">
             Field notes on high-converting performance marketing, generative AI visuals, brand identities, and creative direction from India.
           </p>
-
-          <div style="display: inline-flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
-            <button type="button" class="btn-scrapbook-primary" onclick="window.openPublicBlogEditor && window.openPublicBlogEditor()" style="font-size: 0.9rem; padding: 0.5rem 1.3rem;">
-              ➕ Add New Blog Post <span>✎</span>
-            </button>
-          </div>
         </div>
 
         <!-- Search & Filter Controls -->
@@ -149,9 +143,14 @@
         <div style="font-family: var(--font-handwriting); font-size: 1.4rem; color: var(--ink-secondary);">
           Written by Rizal Rahman ✦ Manager at Monochrome FX
         </div>
-        <button class="btn-scrapbook-primary" id="article-modal-done-btn" style="font-size: 0.9rem; padding: 0.5rem 1.4rem;">
-          Back to Journal ↑
-        </button>
+        <div style="display: inline-flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+          <button type="button" class="btn-scrapbook-secondary" id="modal-article-share-btn" style="font-size: 0.9rem; padding: 0.5rem 1.2rem;">
+            🔗 Share
+          </button>
+          <button class="btn-scrapbook-primary" id="article-modal-done-btn" style="font-size: 0.9rem; padding: 0.5rem 1.4rem;">
+            Back to Journal ↑
+          </button>
+        </div>
       </div>
 
     </div>
@@ -208,10 +207,11 @@
     let searchQuery = '';
 
     function initBlogPage() {
-      if (typeof initPublicBlogEditor === 'function') {
-        initPublicBlogEditor(renderBlogGrid);
-      }
       renderBlogGrid();
+
+      window.addEventListener('rizal:blogs-synced', () => {
+        renderBlogGrid();
+      });
 
       // Mobile Menu
       const toggle = document.getElementById('mobile-toggle');
@@ -230,6 +230,10 @@
           pill.classList.add('active');
           currentCategory = pill.getAttribute('data-category');
           renderBlogGrid();
+
+      window.addEventListener('rizal:blogs-synced', () => {
+        renderBlogGrid();
+      });
         });
       });
 
@@ -239,6 +243,10 @@
         searchInput.addEventListener('input', (e) => {
           searchQuery = e.target.value.toLowerCase().trim();
           renderBlogGrid();
+
+      window.addEventListener('rizal:blogs-synced', () => {
+        renderBlogGrid();
+      });
         });
       }
 
@@ -315,8 +323,8 @@
 
               <div class="blog-card-footer">
                 <span class="btn-read-entry">Read Entry <span>↗</span></span>
-                <div style="display: inline-flex; align-items: center; gap: 0.6rem;">
-                  <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.openPublicBlogEditor && window.openPublicBlogEditor('${post.id}')" title="Edit this blog post">✎ Edit</button>
+                <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                  <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.shareBlogArticle && window.shareBlogArticle('${post.id}')" title="Share this blog post">🔗 Share</button>
                   <span class="blog-views-count">👁 ${post.views || 0}</span>
                 </div>
               </div>
@@ -352,9 +360,19 @@
 
       document.getElementById('modal-article-content').innerHTML = post.content || `<p>${post.excerpt}</p>`;
 
+      const shareBtn = document.getElementById('modal-article-share-btn');
+      if (shareBtn) {
+        shareBtn.onclick = () => window.shareBlogArticle && window.shareBlogArticle(postId);
+      }
+
       const modal = document.getElementById('article-modal');
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
+    }
+
+    const sharedArticleId = new URLSearchParams(window.location.search).get('article');
+    if (sharedArticleId) {
+      setTimeout(() => openArticle(sharedArticleId), 120);
     }
   </script>
 </body>

@@ -186,10 +186,6 @@
         <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
           Enter Content Manager <span>→</span>
         </button>
-
-        <button type="button" id="quick-demo-login-btn" class="filter-pill" style="width: 100%; text-align: center; background-color: var(--color-mint-soft); color: var(--color-mint); border-color: var(--color-mint);">
-          ⚡ Quick 1-Click Access
-        </button>
       </form>
     </div>
 
@@ -696,23 +692,36 @@
       }
 
       // Login Handlers
-      document.getElementById('login-form').addEventListener('submit', (e) => {
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const pin = document.getElementById('admin-pin-input').value.trim();
+        const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+        if (isHttp) {
+          try {
+            const res = await fetch('/api/blogs?action=verify', { headers: { 'x-admin-pin': pin } });
+            if (res.ok) {
+              sessionStorage.setItem('rizal_admin_pin', pin);
+              setAdminLoggedIn(true);
+              showDashboard();
+              return;
+            }
+            if (res.status !== 503 && res.status !== 404) {
+              alert('Invalid Admin PIN.');
+              return;
+            }
+          } catch (_) {}
+        }
         if (pin === 'admin' || pin === '1234' || pin === 'rizal') {
+          sessionStorage.setItem('rizal_admin_pin', pin);
           setAdminLoggedIn(true);
           showDashboard();
         } else {
-          alert('Invalid passcode. Use "admin" or "1234".');
+          alert('Invalid passcode.');
         }
       });
 
-      document.getElementById('quick-demo-login-btn').addEventListener('click', () => {
-        setAdminLoggedIn(true);
-        showDashboard();
-      });
-
       document.getElementById('logout-btn').addEventListener('click', () => {
+        sessionStorage.removeItem('rizal_admin_pin');
         setAdminLoggedIn(false);
         showLogin();
       });
@@ -824,11 +833,18 @@
       document.getElementById('logout-btn').style.display = 'none';
     }
 
-    function showDashboard() {
+    async function showDashboard() {
       document.getElementById('login-container').style.display = 'none';
       document.getElementById('dashboard-container').style.display = 'block';
       document.getElementById('logout-btn').style.display = 'inline-block';
       loadAllData();
+      if (typeof window.syncBlogPostsFromServer === 'function') {
+        const pin = sessionStorage.getItem('rizal_admin_pin') || '';
+        const res = await window.syncBlogPostsFromServer(true, pin);
+        if (res && res.configured) {
+          loadAllData();
+        }
+      }
     }
 
     function loadAllData() {
@@ -932,7 +948,11 @@
       showAdminToast('✎ Editing article: ' + post.title);
     }
 
-    function saveBlogForm() {
+    let isSavingBlog = false;
+    async function saveBlogForm() {
+      if (isSavingBlog) return;
+      isSavingBlog = true;
+      try {
       const id = document.getElementById('blog-edit-id').value;
       const title = document.getElementById('blog-title').value.trim();
       const excerpt = document.getElementById('blog-excerpt').value.trim();
@@ -944,29 +964,54 @@
 
       const payload = {
         title, excerpt, content, category, readTime, coverImage, status,
+        slug: typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(title) : undefined,
+        publishedAt: new Date().toISOString(),
         date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())
       };
       if (id) payload.id = id;
 
-      saveBlogPost(payload);
+      const res = typeof window.saveBlogPostToServer === 'function'
+        ? await window.saveBlogPostToServer(payload)
+        : { ok: true, localOnly: true, post: saveBlogPost(payload) };
+
       closeBlogEditor();
       loadAllData();
-      showAdminToast(id ? '✦ Article updated successfully!' : '✦ New article added successfully!');
+      if (res.ok && !res.localOnly) {
+        showAdminToast(id ? '✦ Article updated & synced to cloud!' : '✦ New article published to cloud!');
+      } else if (res.localOnly) {
+        showAdminToast(id ? '✦ Article updated locally!' : '✦ New article saved locally!');
+      } else {
+        showAdminToast(`⚠ Saved locally, cloud sync failed: ${res.error}`);
+      }
+      } finally {
+        isSavingBlog = false;
+      }
     }
 
-    function toggleBlog(id) {
+    async function toggleBlog(id) {
       const newStatus = togglePostStatus(id);
+      const post = getBlogPost(id);
+      if (post && typeof window.saveBlogPostToServer === 'function') {
+        await window.saveBlogPostToServer(post);
+      }
       loadAllData();
       showAdminToast(`✦ Article status changed to ${newStatus === 'published' ? 'Published' : 'Draft'}!`);
     }
 
-    function removeBlogPost(id) {
+    async function removeBlogPost(id) {
       const backup = [...getBlogPosts()];
       const target = backup.find(p => p.id === id);
-      deleteBlogPost(id);
+      if (typeof window.deleteBlogPostFromServer === 'function') {
+        await window.deleteBlogPostFromServer(id);
+      } else {
+        deleteBlogPost(id);
+      }
       loadAllData();
-      showAdminToast(`🗑 Deleted article "${target ? target.title : id}"`, () => {
+      showAdminToast(`🗑 Deleted article "${target ? target.title : id}"`, async () => {
         localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(backup));
+        if (target && typeof window.saveBlogPostToServer === 'function') {
+          await window.saveBlogPostToServer(target);
+        }
         loadAllData();
         showAdminToast('✦ Article restored!');
       });

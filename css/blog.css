@@ -684,3 +684,55 @@
 [data-theme="dark"] .blog-card-footer {
   border-top-color: #414653;
 }
+
+/* Social Share Modal Styles */
+.share-url-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.share-url-row .admin-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.share-platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.share-platform-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1.5px solid var(--ink-primary);
+  background: var(--bg-paper-aged, #FDFBF7);
+  color: var(--ink-primary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.share-platform-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0px var(--ink-primary);
+}
+
+[data-theme="dark"] .share-platform-btn {
+  background: var(--bg-paper-aged);
+  border-color: #414653;
+  color: var(--ink-primary);
+}
+
+[data-theme="dark"] .share-platform-btn:hover {
+  border-color: var(--color-pink);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+}

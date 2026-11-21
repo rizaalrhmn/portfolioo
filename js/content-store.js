@@ -368,43 +368,56 @@ function getBlogPosts() {
       return [...DEFAULT_BLOG_POSTS];
     }
     const posts = JSON.parse(raw);
-    return Array.isArray(posts) ? posts : [...DEFAULT_BLOG_POSTS];
+    if (!Array.isArray(posts)) return [...DEFAULT_BLOG_POSTS];
+    // Ensure every post has a stable slug and refresh default seed coverImage if needed
+    return posts.map((p) => {
+      const def = DEFAULT_BLOG_POSTS.find(d => d.id === p.id);
+      const slug = p.slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(p.title) : p.id);
+      return def ? { ...p, slug, coverImage: def.coverImage } : { ...p, slug };
+    });
   } catch (e) {
     return [...DEFAULT_BLOG_POSTS];
   }
 }
 
-function getBlogPost(id) {
+function getBlogPost(idOrSlug) {
   const posts = getBlogPosts();
-  return posts.find(p => p.id === id) || null;
+  return posts.find(p =>
+    p.id === idOrSlug ||
+    p.slug === idOrSlug ||
+    (typeof window.slugifyBlogTitle === 'function' && window.slugifyBlogTitle(p.title) === idOrSlug)
+  ) || null;
 }
 
 function saveBlogPost(postData) {
   const posts = getBlogPosts();
   const existingIdx = posts.findIndex(p => p.id === postData.id);
+  let savedPost;
 
   if (existingIdx >= 0) {
-    posts[existingIdx] = {
+    savedPost = {
       ...posts[existingIdx],
       ...postData,
+      slug: postData.slug || posts[existingIdx].slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(postData.title || posts[existingIdx].title) : posts[existingIdx].id),
       updatedAt: new Date().toISOString()
     };
+    posts[existingIdx] = savedPost;
   } else {
     const newId = 'post-' + Date.now();
-    const newPost = {
+    savedPost = {
       id: newId,
       views: 0,
       createdAt: new Date().toISOString(),
       ...postData
     };
-    if (!newPost.slug) {
-      newPost.slug = newPost.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    if (!savedPost.slug) {
+      savedPost.slug = savedPost.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-    posts.unshift(newPost);
+    posts.unshift(savedPost);
   }
 
   localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(posts));
-  return true;
+  return savedPost;
 }
 
 function deleteBlogPost(id) {
@@ -719,261 +732,6 @@ function getScrapbookFillerDoodles(itemCount, cols = 3) {
   return html;
 }
 
-/* ==========================================================================
-   PUBLIC VISITOR BLOG ADD & EDIT MODAL (ADD & EDIT ONLY — NO DELETE)
-   Allows any visitor on index.html or blog.html to Add a new blog or Edit
-   an existing blog without having a Delete option.
-   ========================================================================== */
-function initPublicBlogEditor(onSaveCallback) {
-  if (!document.getElementById('public-blog-editor-modal')) {
-    const modalWrap = document.createElement('div');
-    modalWrap.id = 'public-blog-editor-modal';
-    modalWrap.className = 'scrapbook-modal-backdrop';
-    modalWrap.setAttribute('aria-hidden', 'true');
-    modalWrap.setAttribute('role', 'dialog');
-    modalWrap.innerHTML = `
-      <div class="article-modal-window ruled-paper" style="max-width: 780px;">
-        <button type="button" class="modal-close-btn" id="pub-blog-modal-close" aria-label="Close editor">✕</button>
-        <div class="washi-tape tape-tl tape-pink"></div>
-        <div class="washi-tape tape-tr tape-yellow"></div>
-
-        <div style="margin-bottom: 1.5rem;">
-          <span class="article-category-tag">PUBLIC COMMUNITY NOTEBOOK • ADD & EDIT ONLY</span>
-          <h2 class="article-title-display" id="pub-blog-modal-heading" style="font-size: 2rem; margin-bottom: 0.3rem;">
-            Add a New Blog Article ✎
-          </h2>
-          <p style="font-size: 0.9rem; color: var(--ink-muted);">
-            Share your insights or update this article. Published entries appear immediately on the website!
-          </p>
-        </div>
-
-        <form id="pub-blog-form" style="display: flex; flex-direction: column; gap: 1.1rem;">
-          <input type="hidden" id="pub-blog-id" value="">
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div>
-              <label class="form-label" for="pub-blog-title">Article Title *</label>
-              <input type="text" id="pub-blog-title" class="admin-input" placeholder="e.g. How Small Brands Win on Social Media" required>
-            </div>
-            <div>
-              <label class="form-label" for="pub-blog-category">Category *</label>
-              <select id="pub-blog-category" class="admin-select" required>
-                <option value="Digital Marketing">Digital Marketing</option>
-                <option value="AI & Creative Tech">AI & Creative Tech</option>
-                <option value="Design & Branding">Design & Branding</option>
-                <option value="Motion & Video">Motion & Video</option>
-                <option value="Strategy & Leadership">Strategy & Leadership</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div>
-              <label class="form-label" for="pub-blog-readtime">Read Time</label>
-              <input type="text" id="pub-blog-readtime" class="admin-input" value="5 min read" required>
-            </div>
-            <div>
-              <label class="form-label" for="pub-blog-image">Cover Image (Preset or Upload up to 5MB)</label>
-              <select id="pub-blog-image" class="admin-select">
-                <option value="assets/images/project-2-art.jpg">Campaign Artwork (Orange)</option>
-                <option value="assets/images/project-1-art.jpg">Luxury Branding (Purple)</option>
-                <option value="assets/images/project-3-art.jpg">Packaging Design (Mint)</option>
-                <option value="assets/images/project-4-card.jpg">Higgsfield AI Visuals (Blue)</option>
-                <option value="assets/images/project-5-card.jpg">Motion Graphics (Pink)</option>
-                <option value="assets/images/project-6-card.jpg">Studio Showreel (Yellow)</option>
-              </select>
-              <input type="hidden" id="pub-blog-image-data" value="">
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem; flex-wrap: wrap;">
-                <label class="btn-admin-action" style="cursor: pointer; margin: 0;">
-                  📷 Upload Image (Max 5MB)
-                  <input type="file" id="pub-blog-image-file" accept="image/*" style="display: none;">
-                </label>
-                <button type="button" class="btn-admin-action" id="pub-blog-image-clear" style="display: none;">Clear Upload ✕</button>
-              </div>
-              <div id="pub-blog-image-status" style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 0.3rem;"></div>
-              <img id="pub-blog-image-preview" src="assets/images/project-2-art.jpg" alt="Cover preview" style="margin-top: 0.45rem; width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #E4E4E7;">
-            </div>
-          </div>
-
-          <div>
-            <label class="form-label" for="pub-blog-excerpt">Short Summary / Excerpt *</label>
-            <textarea id="pub-blog-excerpt" class="admin-textarea" rows="2" placeholder="A short 1-2 sentence hook displayed on the blog card..." required></textarea>
-          </div>
-
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.4rem;">
-              <label class="form-label" for="pub-blog-content" style="margin-bottom: 0;">Full Blog Article Content *</label>
-              <div style="display: flex; gap: 0.35rem;">
-                <button type="button" class="btn-admin-action" id="pub-tag-h3">+ Heading</button>
-                <button type="button" class="btn-admin-action" id="pub-tag-bold">+ Bold</button>
-                <button type="button" class="btn-admin-action" id="pub-tag-note">+ Highlight Box</button>
-              </div>
-            </div>
-            <textarea id="pub-blog-content" class="admin-textarea" rows="8" placeholder="Write your full blog post here..." required></textarea>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.5rem;">
-            <button type="button" class="btn-scrapbook-secondary" id="pub-blog-cancel">
-              Cancel
-            </button>
-            <button type="submit" class="btn-scrapbook-primary">
-              Save & Publish Blog ✦
-            </button>
-          </div>
-        </form>
-      </div>
-    `;
-    document.body.appendChild(modalWrap);
-
-    const closeModal = () => {
-      modalWrap.classList.remove('open');
-      modalWrap.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    };
-
-    document.getElementById('pub-blog-modal-close').addEventListener('click', closeModal);
-    document.getElementById('pub-blog-cancel').addEventListener('click', closeModal);
-    modalWrap.addEventListener('click', (e) => {
-      if (e.target === modalWrap) closeModal();
-    });
-
-    const insertAtCursor = (openTag, closeTag) => {
-      const ta = document.getElementById('pub-blog-content');
-      if (!ta) return;
-      const start = ta.selectionStart || 0;
-      const end = ta.selectionEnd || 0;
-      const sel = ta.value.substring(start, end) || 'Text';
-      ta.value = ta.value.substring(0, start) + openTag + sel + closeTag + ta.value.substring(end);
-      ta.focus();
-    };
-
-    document.getElementById('pub-tag-h3').addEventListener('click', () => insertAtCursor('<h3>', '</h3>'));
-    document.getElementById('pub-tag-bold').addEventListener('click', () => insertAtCursor('<strong>', '</strong>'));
-    document.getElementById('pub-tag-note').addEventListener('click', () => insertAtCursor('<div class="blog-callout-note">', '</div>'));
-
-    const pubFileInput = document.getElementById('pub-blog-image-file');
-    const pubDataInput = document.getElementById('pub-blog-image-data');
-    const pubSelect = document.getElementById('pub-blog-image');
-    const pubClearBtn = document.getElementById('pub-blog-image-clear');
-    const pubStatus = document.getElementById('pub-blog-image-status');
-    const pubPreview = document.getElementById('pub-blog-image-preview');
-
-    pubSelect.addEventListener('change', () => {
-      pubDataInput.value = '';
-      pubClearBtn.style.display = 'none';
-      pubStatus.textContent = '';
-      pubPreview.src = pubSelect.value;
-    });
-
-    pubClearBtn.addEventListener('click', () => {
-      pubDataInput.value = '';
-      pubFileInput.value = '';
-      pubClearBtn.style.display = 'none';
-      pubStatus.textContent = '';
-      pubPreview.src = pubSelect.value;
-    });
-
-    pubFileInput.addEventListener('change', async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      try {
-        pubStatus.style.color = 'var(--ink-muted)';
-        pubStatus.textContent = 'Processing image...';
-        const dataUrl = await window.processPortfolioImageUpload(file);
-        pubDataInput.value = dataUrl;
-        pubPreview.src = dataUrl;
-        pubClearBtn.style.display = 'inline-block';
-        pubStatus.style.color = '#16A34A';
-        pubStatus.textContent = `Uploaded: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-      } catch (err) {
-        pubFileInput.value = '';
-        pubStatus.style.color = '#EF4444';
-        pubStatus.textContent = err.message || 'Could not process image.';
-      }
-    });
-
-    document.getElementById('pub-blog-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('pub-blog-id').value.trim();
-      const title = document.getElementById('pub-blog-title').value.trim();
-      const category = document.getElementById('pub-blog-category').value;
-      const readTime = document.getElementById('pub-blog-readtime').value.trim() || '5 min read';
-      const coverImage = pubDataInput.value.trim() || document.getElementById('pub-blog-image').value;
-      const excerpt = document.getElementById('pub-blog-excerpt').value.trim();
-      let content = document.getElementById('pub-blog-content').value.trim();
-
-      if (!content.includes('<p>') && !content.includes('<h3>')) {
-        content = content
-          .split(/\n\s*\n/)
-          .map(p => `<p>${p.trim()}</p>`)
-          .join('\n');
-      }
-
-      const payload = {
-        title,
-        category,
-        readTime,
-        coverImage,
-        excerpt,
-        content,
-        status: 'published',
-        date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())
-      };
-      if (id) payload.id = id;
-
-      saveBlogPost(payload);
-      closeModal();
-      if (typeof window._pubBlogSaveCallback === 'function') {
-        window._pubBlogSaveCallback();
-      }
-    });
-  }
-
-  if (typeof onSaveCallback === 'function') {
-    window._pubBlogSaveCallback = onSaveCallback;
-  }
-
-  window.openPublicBlogEditor = function (postId = null) {
-    const modal = document.getElementById('public-blog-editor-modal');
-    if (!modal) return;
-    const form = document.getElementById('pub-blog-form');
-    const heading = document.getElementById('pub-blog-modal-heading');
-
-    if (postId) {
-      const post = getBlogPost(postId);
-      if (!post) return;
-      heading.textContent = 'Edit Blog Article ✎';
-      document.getElementById('pub-blog-id').value = post.id;
-      document.getElementById('pub-blog-title').value = post.title || '';
-      document.getElementById('pub-blog-category').value = post.category || 'Digital Marketing';
-      document.getElementById('pub-blog-readtime').value = post.readTime || '5 min read';
-      const imgVal = post.coverImage || 'assets/images/project-2-art.jpg';
-      const isDataImg = imgVal.startsWith('data:image/');
-      document.getElementById('pub-blog-image-data').value = isDataImg ? imgVal : '';
-      document.getElementById('pub-blog-image').value = isDataImg ? 'assets/images/project-2-art.jpg' : imgVal;
-      document.getElementById('pub-blog-image-preview').src = imgVal;
-      document.getElementById('pub-blog-image-clear').style.display = isDataImg ? 'inline-block' : 'none';
-      document.getElementById('pub-blog-image-status').textContent = isDataImg ? 'Using custom uploaded image' : '';
-      document.getElementById('pub-blog-excerpt').value = post.excerpt || '';
-      document.getElementById('pub-blog-content').value = (post.content || post.excerpt || '').trim();
-    } else {
-      heading.textContent = 'Add a New Blog Article ✎';
-      form.reset();
-      document.getElementById('pub-blog-id').value = '';
-      document.getElementById('pub-blog-readtime').value = '5 min read';
-      document.getElementById('pub-blog-image').value = 'assets/images/project-2-art.jpg';
-      document.getElementById('pub-blog-image-data').value = '';
-      document.getElementById('pub-blog-image-preview').src = 'assets/images/project-2-art.jpg';
-      document.getElementById('pub-blog-image-clear').style.display = 'none';
-      document.getElementById('pub-blog-image-status').textContent = '';
-    }
-
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  };
-}
-
 /**
  * Shared 5 MB image upload + optimization helper for Blog & Project editors.
  * Validates file type and <= 5 MB size, then scales large photos for reliable localStorage persistence.
@@ -1024,3 +782,240 @@ window.processPortfolioImageUpload = function (file) {
     reader.readAsDataURL(file);
   });
 };
+
+/**
+ * Slug & Public URL Helpers
+ */
+window.slugifyBlogTitle = function (text) {
+  return String(text || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || ('post-' + Date.now());
+};
+
+window.getBlogPublicUrl = function (postOrId) {
+  const post = typeof postOrId === 'string'
+    ? (typeof getBlogPost === 'function' ? getBlogPost(postOrId) : null)
+    : postOrId;
+  const slug = (post && post.slug) || (post && post.title && window.slugifyBlogTitle(post.title)) || String(postOrId || '');
+  const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+  if (isHttp) {
+    return `${window.location.origin}/blog/${encodeURIComponent(slug)}`;
+  }
+  return `blog.html?article=${encodeURIComponent(slug)}`;
+};
+
+/**
+ * Persistent Server Sync (Vercel /api/blogs -> Supabase Postgres)
+ * Falls back gracefully to localStorage on file:// or when DB env vars are not yet configured.
+ */
+window.syncBlogPostsFromServer = async function (includeDrafts = false, adminPin = '') {
+  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
+    return { configured: false, posts: typeof getBlogPosts === 'function' ? getBlogPosts() : [] };
+  }
+  try {
+    const query = includeDrafts ? '?all=1' : '';
+    const headers = adminPin ? { 'x-admin-pin': adminPin } : {};
+    const res = await fetch(`/api/blogs${query}`, { headers, cache: 'no-store' });
+    const data = await res.json();
+    if (!res.ok || !data || !Array.isArray(data.posts)) {
+      return { configured: false, posts: getBlogPosts(), error: data && data.error };
+    }
+    if (data.posts.length > 0) {
+      localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(data.posts));
+    }
+    window.dispatchEvent(new CustomEvent('rizal:blogs-synced', { detail: { posts: data.posts } }));
+    return { configured: true, posts: data.posts };
+  } catch (err) {
+    return { configured: false, posts: typeof getBlogPosts === 'function' ? getBlogPosts() : [], error: err.message };
+  }
+};
+
+window.saveBlogPostToServer = async function (postData, adminPin) {
+  const payload = {
+    ...postData,
+    slug: postData.slug || window.slugifyBlogTitle(postData.title)
+  };
+  const savedLocal = saveBlogPost(payload);
+  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
+    return { ok: true, localOnly: true, post: savedLocal };
+  }
+  try {
+    const res = await fetch('/api/blogs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || ''
+      },
+      body: JSON.stringify(savedLocal)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, localSaved: true, error: (data && data.error) || 'Failed to save to cloud database.' };
+    }
+    return { ok: true, post: data.post || savedLocal };
+  } catch (err) {
+    return { ok: false, localSaved: true, error: err.message };
+  }
+};
+
+window.deleteBlogPostFromServer = async function (id, adminPin) {
+  deleteBlogPost(id);
+  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
+    return { ok: true, localOnly: true };
+  }
+  try {
+    const res = await fetch(`/api/blogs?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || '' }
+    });
+    const data = await res.json();
+    if (!res.ok) return { ok: false, error: (data && data.error) || 'Failed to delete from cloud database.' };
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+};
+
+window.migrateLocalBlogsToServer = async function (adminPin) {
+  const posts = getBlogPosts();
+  const res = await fetch('/api/blogs?action=migrate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || ''
+    },
+    body: JSON.stringify({ posts })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error((data && data.error) || 'Migration failed');
+  return data;
+};
+
+/**
+ * Full Social Share Modal (Copy Link, WhatsApp, LinkedIn, Facebook, X/Twitter, Native Share)
+ */
+window.shareBlogArticle = function (postId) {
+  const posts = typeof getBlogPosts === 'function' ? getBlogPosts() : [];
+  const post = posts.find(p => p.id === postId || p.slug === postId) || null;
+  const shareUrl = window.getBlogPublicUrl(post || postId);
+  const title = post ? post.title : document.title;
+  const text = post ? post.excerpt : 'Check out this article on Rizal Rahman\'s journal!';
+
+  let modal = document.getElementById('blog-share-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'blog-share-modal';
+    modal.className = 'scrapbook-modal-backdrop';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('role', 'dialog');
+    modal.innerHTML = `
+      <div class="modal-paper-window blog-share-window" style="max-width: 480px; padding: 2rem 1.75rem;">
+        <button type="button" class="modal-close-btn" id="blog-share-close" aria-label="Close share dialog">✕</button>
+        <div class="washi-tape tape-tl tape-yellow"></div>
+        <div class="washi-tape tape-tr tape-pink"></div>
+
+        <span class="article-category-tag">SHARE ARTICLE ✦</span>
+        <h3 id="share-modal-title" style="font-family: var(--font-cutout); font-size: 1.45rem; color: var(--ink-primary); margin: 0.45rem 0 1rem; line-height: 1.3;"></h3>
+
+        <div class="share-url-row">
+          <input type="text" id="share-modal-url" class="admin-input" readonly aria-label="Article public URL">
+          <button type="button" id="share-copy-btn" class="btn-scrapbook-primary" style="padding: 0.55rem 1.1rem; font-size: 0.85rem; white-space: nowrap;">Copy Link</button>
+        </div>
+        <div id="share-copy-feedback" style="font-family: var(--font-mono); font-size: 0.78rem; min-height: 1.2rem; margin: 0.4rem 0 1rem; color: #16A34A;"></div>
+
+        <div class="share-platforms-grid">
+          <a id="share-wa-link" target="_blank" rel="noopener noreferrer" class="share-platform-btn share-wa">💬 WhatsApp</a>
+          <a id="share-li-link" target="_blank" rel="noopener noreferrer" class="share-platform-btn share-li">💼 LinkedIn</a>
+          <a id="share-fb-link" target="_blank" rel="noopener noreferrer" class="share-platform-btn share-fb">📘 Facebook</a>
+          <a id="share-x-link" target="_blank" rel="noopener noreferrer" class="share-platform-btn share-x">𝕏 Post on X</a>
+        </div>
+
+        <button type="button" id="share-native-btn" class="btn-scrapbook-secondary" style="width: 100%; justify-content: center; margin-top: 0.9rem; display: none;">
+          📱 Share via Device...
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const closeShare = () => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+    document.getElementById('blog-share-close').addEventListener('click', closeShare);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeShare();
+    });
+  }
+
+  document.getElementById('share-modal-title').textContent = title;
+  const urlInput = document.getElementById('share-modal-url');
+  const feedback = document.getElementById('share-copy-feedback');
+  urlInput.value = shareUrl;
+  feedback.textContent = '';
+
+  const encUrl = encodeURIComponent(shareUrl);
+  const encTitle = encodeURIComponent(title);
+  document.getElementById('share-wa-link').href = `https://wa.me/?text=${encodeURIComponent(title + ' — ' + shareUrl)}`;
+  document.getElementById('share-li-link').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encUrl}`;
+  document.getElementById('share-fb-link').href = `https://www.facebook.com/sharer/sharer.php?u=${encUrl}`;
+  document.getElementById('share-x-link').href = `https://twitter.com/intent/tweet?text=${encTitle}&url=${encUrl}`;
+
+  document.getElementById('share-copy-btn').onclick = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        urlInput.select();
+        urlInput.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+      }
+      feedback.style.color = '#16A34A';
+      feedback.textContent = '✓ Link copied to clipboard!';
+    } catch (err) {
+      urlInput.select();
+      try {
+        document.execCommand('copy');
+        feedback.style.color = '#16A34A';
+        feedback.textContent = '✓ Link copied!';
+      } catch (e2) {
+        feedback.style.color = '#EF4444';
+        feedback.textContent = 'Press Ctrl+C to copy the link above.';
+      }
+    }
+  };
+
+  const nativeBtn = document.getElementById('share-native-btn');
+  if (navigator.share) {
+    nativeBtn.style.display = 'inline-flex';
+    nativeBtn.onclick = async () => {
+      try {
+        await navigator.share({ title, text, url: shareUrl });
+      } catch (err) {
+        if (err && err.name !== 'AbortError') {
+          feedback.style.color = '#EF4444';
+          feedback.textContent = 'Native share unavailable; use the options above.';
+        }
+      }
+    };
+  } else {
+    nativeBtn.style.display = 'none';
+  }
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+};
+
+// Automatically sync published blog posts from Vercel API on HTTP/HTTPS load
+if (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.location.pathname.endsWith('admin.html')) {
+      window.syncBlogPostsFromServer(false);
+    }
+  });
+}

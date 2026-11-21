@@ -234,17 +234,27 @@ function initDynamicContent() {
   renderDynamicTestimonials();
   renderDynamicProfile();
   renderDynamicHomeBlogs();
+
+  window.addEventListener('rizal:blogs-synced', () => {
+    renderDynamicHomeBlogs();
+  });
 }
 
 function renderDynamicHomeBlogs() {
   const grid = document.getElementById('home-blog-grid');
   if (!grid || typeof getBlogPosts !== 'function') return;
 
-  if (typeof initPublicBlogEditor === 'function') {
-    initPublicBlogEditor(renderDynamicHomeBlogs);
-  }
-
   const allPosts = getBlogPosts().filter(p => p.status === 'published');
+  if (allPosts.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.25rem; border-radius: 16px; border: 2px dashed #CBD5E1;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">📓</div>
+        <h3 style="font-family: var(--font-cutout); font-size: 1.5rem; color: var(--ink-primary);">No published entries yet</h3>
+        <p style="color: var(--ink-muted); margin-top: 0.35rem;">Check back soon for new essays &amp; marketing notes.</p>
+      </div>
+    `;
+    return;
+  }
   const tapeColors = ['tape-yellow', 'tape-pink', 'tape-blue', 'tape-cream'];
   const fillerHtml = typeof getScrapbookFillerDoodles === 'function' ? getScrapbookFillerDoodles(allPosts.length, 3) : '';
 
@@ -267,8 +277,8 @@ function renderDynamicHomeBlogs() {
           <p class="blog-card-excerpt">${post.excerpt}</p>
           <div class="blog-card-footer">
             <span class="btn-read-entry">Read Entry <span>↗</span></span>
-            <div style="display: inline-flex; align-items: center; gap: 0.6rem;">
-              <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.openPublicBlogEditor && window.openPublicBlogEditor('${post.id}')" title="Edit this blog post">✎ Edit</button>
+            <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+              <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.shareBlogArticle && window.shareBlogArticle('${post.id}')" title="Share this blog post">🔗 Share</button>
               <span class="blog-views-count">👁 ${post.views || 0}</span>
             </div>
           </div>
@@ -298,6 +308,7 @@ function renderDynamicHomeBlogs() {
   window.openHomeBlogArticle = (postId) => {
     const post = typeof getBlogPost === 'function' ? getBlogPost(postId) : allPosts.find(p => p.id === postId);
     if (!post || !modal) return;
+    window._activeHomeArticleId = postId;
     if (typeof incrementPostView === 'function') incrementPostView(postId);
 
     const catEl = document.getElementById('modal-article-category');
@@ -323,9 +334,25 @@ function renderDynamicHomeBlogs() {
     }
     if (contentEl) contentEl.innerHTML = post.content || `<p>${post.excerpt}</p>`;
 
+    const modalShareBtn = document.getElementById('modal-article-share-btn');
+    if (modalShareBtn) {
+      modalShareBtn.onclick = () => {
+        if (window._activeHomeArticleId && typeof window.shareBlogArticle === 'function') {
+          window.shareBlogArticle(window._activeHomeArticleId);
+        }
+      };
+    }
+
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
   };
+
+  // Auto-open shared article URL (?article=...)
+  const sharedId = new URLSearchParams(window.location.search).get('article');
+  if (sharedId && !window._sharedArticleOpened) {
+    window._sharedArticleOpened = true;
+    setTimeout(() => window.openHomeBlogArticle(sharedId), 150);
+  }
 
   if (typeof window.refreshScrapbookAnimations === 'function') {
     window.refreshScrapbookAnimations();
