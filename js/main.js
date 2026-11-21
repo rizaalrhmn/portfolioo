@@ -127,7 +127,13 @@ function initProjectsSectionVisibility() {
     const targetTop = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerHeight - 8);
     window.scrollTo({
       top: targetTop,
-      behavior: instant ? 'auto' : 'smooth'
+      behavior: instant ? 'instant' : 'smooth'
+    });
+  }
+
+  function setActiveNavLink(navId) {
+    document.querySelectorAll('.nav-link').forEach((link) => {
+      link.classList.toggle('active', link.getAttribute('data-nav') === navId);
     });
   }
 
@@ -152,6 +158,7 @@ function initProjectsSectionVisibility() {
     const { updateHistory = true, instant = false } = options;
     closeMobileDrawer();
     setProjectsVisible(true);
+    setActiveNavLink('projects');
     if (updateHistory && window.location.hash !== '#projects') {
       history.pushState({ section: 'projects' }, '', '#projects');
     }
@@ -181,6 +188,7 @@ function initProjectsSectionVisibility() {
       e.preventDefault();
       closeMobileDrawer();
       setProjectsVisible(false);
+      setActiveNavLink(href.slice(1));
       if (window.location.hash !== href) {
         history.pushState({ section: href.slice(1) }, '', href);
       }
