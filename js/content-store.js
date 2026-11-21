@@ -23,7 +23,7 @@ const DEFAULT_BLOG_POSTS = [
     date: 'Nov 17, 2026',
     status: 'published',
     views: 486,
-    coverImage: 'assets/images/project-2-art.jpg',
+    coverImage: 'assets/images/project-6-card.jpg',
     tags: ['DigitalMarketing', 'SmallBusiness', 'MetaAds', 'SEO', 'BrandGrowth'],
     excerpt: 'Strip away the confusing agency jargon: here is a clear, practical 1,250-word roadmap explaining how small businesses can use websites, local SEO, social content, and targeted ads to attract loyal customers.',
     content: `
