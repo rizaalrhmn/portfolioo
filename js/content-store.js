@@ -4,6 +4,11 @@
  * with localStorage persistence and default seeds.
  */
 
+const SUPABASE_URL = 'https://hfymxwfozvxpxjnprzvz.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_WQFiD3pzqVNy3S6qFV5OOQ_ZG8kAzvK';
+const ADMIN_ALLOWED_EMAIL = 'rizalrahman8055@gmail.com';
+const SUPABASE_SESSION_KEY = 'rizal_supabase_session_v1';
+
 const BLOG_STORAGE_KEY = 'rizal_blog_posts_v4';
 try { localStorage.removeItem('rizal_blog_posts_v3'); } catch (e) {}
 const PROJECTS_STORAGE_KEY = 'rizal_portfolio_projects_v1';
@@ -602,6 +607,9 @@ function resetAllContent() {
 
 /* Auth helpers */
 function isAdminLoggedIn() {
+  if (typeof window.getSupabaseSession === 'function' && typeof window.isSupabaseAdminSession === 'function') {
+    return window.isSupabaseAdminSession(window.getSupabaseSession());
+  }
   return sessionStorage.getItem(BLOG_AUTH_KEY) === 'true';
 }
 
@@ -813,89 +821,245 @@ window.getBlogPublicUrl = function (postOrId) {
 };
 
 /**
- * Persistent Server Sync (Vercel /api/blogs -> Supabase Postgres)
- * Falls back gracefully to localStorage on file:// or when DB env vars are not yet configured.
+ * Supabase Auth Helpers (Email + Password JWT Auth for Admin Portal)
  */
-window.syncBlogPostsFromServer = async function (includeDrafts = false, adminPin = '') {
-  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
-    return { configured: false, posts: typeof getBlogPosts === 'function' ? getBlogPosts() : [] };
-  }
+window.getSupabaseSession = function () {
   try {
-    const query = includeDrafts ? '?all=1' : '';
-    const headers = adminPin ? { 'x-admin-pin': adminPin } : {};
-    const res = await fetch(`/api/blogs${query}`, { headers, cache: 'no-store' });
-    const data = await res.json();
-    if (!res.ok || !data || !Array.isArray(data.posts)) {
-      return { configured: false, posts: getBlogPosts(), error: data && data.error };
+    const raw = sessionStorage.getItem(SUPABASE_SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+window.setSupabaseSession = function (session) {
+  if (session && session.access_token) {
+    sessionStorage.setItem(SUPABASE_SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(BLOG_AUTH_KEY, 'true');
+  } else {
+    sessionStorage.removeItem(SUPABASE_SESSION_KEY);
+    sessionStorage.removeItem(BLOG_AUTH_KEY);
+  }
+};
+
+window.isSupabaseAdminSession = function (session) {
+  if (!session || !session.access_token || !session.user) return false;
+  const email = String(session.user.email || '').toLowerCase();
+  const appRole = session.user.app_metadata && session.user.app_metadata.role;
+  return appRole === 'admin' || email === ADMIN_ALLOWED_EMAIL;
+};
+
+window.supabaseSignIn = async function (email, password) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email: String(email || '').trim(), password })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error_description || data.msg || data.message || 'Sign in failed.');
+  }
+  if (!window.isSupabaseAdminSession(data)) {
+    throw new Error('This account is not authorized for the Admin Portal.');
+  }
+  window.setSupabaseSession(data);
+  return data;
+};
+
+window.supabaseSignUp = async function (email, password) {
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (cleanEmail !== ADMIN_ALLOWED_EMAIL) {
+    throw new Error(`Only the authorized admin email (${ADMIN_ALLOWED_EMAIL}) can register.`);
+  }
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email: cleanEmail, password })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error_description || data.msg || data.message || 'Sign up failed.');
+  }
+  if (data.access_token && window.isSupabaseAdminSession(data)) {
+    window.setSupabaseSession(data);
+  }
+  return data;
+};
+
+window.supabaseSignOut = async function () {
+  const session = window.getSupabaseSession();
+  if (session && session.access_token) {
+    try {
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+    } catch (_) {}
+  }
+  window.setSupabaseSession(null);
+};
+
+function mapSupabaseRowToPost(row) {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    category: row.category,
+    readTime: row.read_time,
+    date: row.date,
+    publishedAt: row.published_at,
+    status: row.status,
+    views: row.views || 0,
+    coverImage: row.cover_image,
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    excerpt: row.excerpt,
+    content: row.content,
+    author: row.author || 'Rizal Rahman'
+  };
+}
+
+function mapPostToSupabaseRow(post) {
+  const title = String(post.title || '').trim();
+  const id = String(post.id || ('post-' + Date.now())).trim();
+  const slug = String(post.slug || window.slugifyBlogTitle(title)).trim();
+  return {
+    id,
+    slug,
+    title,
+    category: String(post.category || 'Digital Marketing').trim(),
+    read_time: String(post.readTime || '5 min read').trim(),
+    date: String(post.date || new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())).trim(),
+    published_at: post.publishedAt || new Date().toISOString(),
+    status: post.status === 'draft' ? 'draft' : 'published',
+    views: Number(post.views) || 0,
+    cover_image: String(post.coverImage || 'assets/images/project-1-art.jpg').trim(),
+    tags: Array.isArray(post.tags) ? post.tags : [],
+    excerpt: String(post.excerpt || '').trim(),
+    content: String(post.content || '').trim(),
+    author: String(post.author || 'Rizal Rahman').trim(),
+    updated_at: new Date().toISOString()
+  };
+}
+
+/**
+ * Persistent Server Sync directly with Supabase Postgres (RLS-enforced)
+ */
+window.syncBlogPostsFromServer = async function (includeDrafts = false) {
+  try {
+    const session = window.getSupabaseSession();
+    const useAuth = includeDrafts && session && session.access_token;
+    const filter = useAuth ? '' : 'status=eq.published&';
+    const headers = {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      'Content-Type': 'application/json'
+    };
+    if (useAuth) {
+      headers.Authorization = `Bearer ${session.access_token}`;
     }
-    // Always sync server state (including empty [] when all posts are deleted)
-    localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(data.posts));
-    window.dispatchEvent(new CustomEvent('rizal:blogs-synced', { detail: { posts: data.posts } }));
-    return { configured: true, posts: data.posts };
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?${filter}order=published_at.desc`, {
+      headers,
+      cache: 'no-store'
+    });
+    const rows = await res.json();
+    if (!res.ok || !Array.isArray(rows)) {
+      return { configured: false, posts: getBlogPosts(), error: (rows && rows.message) || `HTTP ${res.status}` };
+    }
+    const posts = rows.map(mapSupabaseRowToPost);
+    localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(posts));
+    window.dispatchEvent(new CustomEvent('rizal:blogs-synced', { detail: { posts } }));
+    return { configured: true, posts };
   } catch (err) {
     return { configured: false, posts: typeof getBlogPosts === 'function' ? getBlogPosts() : [], error: err.message };
   }
 };
 
-window.saveBlogPostToServer = async function (postData, adminPin) {
+window.saveBlogPostToServer = async function (postData) {
+  const session = window.getSupabaseSession();
+  if (!window.isSupabaseAdminSession(session)) {
+    return { ok: false, error: 'Please sign in with your Supabase Admin account first.' };
+  }
   const payload = {
     ...postData,
     slug: postData.slug || window.slugifyBlogTitle(postData.title)
   };
-  const savedLocal = saveBlogPost(payload);
-  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
-    return { ok: true, localOnly: true, post: savedLocal };
-  }
+  const row = mapPostToSupabaseRow(payload);
   try {
-    const res = await fetch('/api/blogs', {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?on_conflict=id`, {
       method: 'POST',
       headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${session.access_token}`,
         'Content-Type': 'application/json',
-        'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || ''
+        Prefer: 'resolution=merge-duplicates,return=representation'
       },
-      body: JSON.stringify(savedLocal)
+      body: JSON.stringify([row])
     });
     const data = await res.json();
     if (!res.ok) {
-      return { ok: false, localSaved: true, error: (data && data.error) || 'Failed to save to cloud database.' };
+      return { ok: false, error: (data && data.message) || `Supabase error (${res.status})` };
     }
-    return { ok: true, post: data.post || savedLocal };
+    const saved = data && data[0] ? mapSupabaseRowToPost(data[0]) : mapSupabaseRowToPost(row);
+    saveBlogPost(saved);
+    return { ok: true, post: saved };
   } catch (err) {
-    return { ok: false, localSaved: true, error: err.message };
+    return { ok: false, error: err.message };
   }
 };
 
-window.deleteBlogPostFromServer = async function (id, adminPin) {
-  deleteBlogPost(id);
-  if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
-    return { ok: true, localOnly: true };
+window.deleteBlogPostFromServer = async function (id) {
+  const session = window.getSupabaseSession();
+  if (!window.isSupabaseAdminSession(session)) {
+    return { ok: false, error: 'Please sign in with your Supabase Admin account first.' };
   }
   try {
-    const res = await fetch(`/api/blogs?id=${encodeURIComponent(id)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
-      headers: { 'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || '' }
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${session.access_token}`
+      }
     });
-    const data = await res.json();
-    if (!res.ok) return { ok: false, error: (data && data.error) || 'Failed to delete from cloud database.' };
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: false, error: (data && data.message) || `Delete failed (${res.status})` };
+    }
+    deleteBlogPost(id);
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err.message };
   }
 };
 
-window.migrateLocalBlogsToServer = async function (adminPin) {
+window.migrateLocalBlogsToServer = async function () {
+  const session = window.getSupabaseSession();
+  if (!window.isSupabaseAdminSession(session)) {
+    throw new Error('Please sign in with your Supabase Admin account first.');
+  }
   const posts = getBlogPosts();
-  const res = await fetch('/api/blogs?action=migrate', {
+  if (!posts.length) return { ok: true, count: 0 };
+  const rows = posts.map(mapPostToSupabaseRow);
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?on_conflict=id`, {
     method: 'POST',
     headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${session.access_token}`,
       'Content-Type': 'application/json',
-      'x-admin-pin': adminPin || sessionStorage.getItem('rizal_admin_pin') || ''
+      Prefer: 'resolution=merge-duplicates,return=representation'
     },
-    body: JSON.stringify({ posts })
+    body: JSON.stringify(rows)
   });
   const data = await res.json();
-  if (!res.ok) throw new Error((data && data.error) || 'Migration failed');
-  return data;
+  if (!res.ok) throw new Error((data && data.message) || 'Migration failed');
+  return { ok: true, count: Array.isArray(data) ? data.length : rows.length };
 };
 
 /**

@@ -177,14 +177,25 @@
         Add, edit, and delete projects, blog posts, praise, and profile info.
       </p>
 
-      <form id="login-form" style="display: flex; flex-direction: column; gap: 1.2rem; text-align: left;">
+      <form id="login-form" style="display: flex; flex-direction: column; gap: 1.1rem; text-align: left;">
         <div>
-          <label class="form-label" for="admin-pin-input">Enter Admin Passcode or PIN</label>
-          <input type="password" id="admin-pin-input" class="admin-input" placeholder="Enter PIN (Default: 1234 or admin)" autocomplete="current-password" required>
+          <label class="form-label" for="admin-email-input">Admin Email (Supabase Auth)</label>
+          <input type="email" id="admin-email-input" class="admin-input" value="rizalrahman8055@gmail.com" autocomplete="email" required>
         </div>
 
-        <button type="submit" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
-          Enter Content Manager <span>→</span>
+        <div>
+          <label class="form-label" for="admin-pin-input">Password</label>
+          <input type="password" id="admin-pin-input" class="admin-input" placeholder="Enter your Supabase password (min 6 chars)" autocomplete="current-password" minlength="6" required>
+        </div>
+
+        <div id="admin-auth-status" style="font-size: 0.84rem; min-height: 1.1rem; color: var(--color-pink);"></div>
+
+        <button type="submit" id="admin-login-submit-btn" class="btn-scrapbook-primary" style="justify-content: center; width: 100%;">
+          Sign In with Supabase <span>→</span>
+        </button>
+
+        <button type="button" id="admin-signup-toggle-btn" class="filter-pill" style="width: 100%; text-align: center;">
+          First time? Create Admin Password
         </button>
       </form>
     </div>
@@ -694,38 +705,60 @@
         showLogin();
       }
 
-      // Login Handlers
+      // Login Handlers (Supabase Auth — Email + Password)
+      let isSignUpMode = false;
+      const authStatusEl = document.getElementById('admin-auth-status');
+      const submitBtn = document.getElementById('admin-login-submit-btn');
+      const toggleModeBtn = document.getElementById('admin-signup-toggle-btn');
+
+      if (toggleModeBtn) {
+        toggleModeBtn.addEventListener('click', () => {
+          isSignUpMode = !isSignUpMode;
+          if (authStatusEl) authStatusEl.textContent = '';
+          if (submitBtn) submitBtn.innerHTML = isSignUpMode ? 'Create Admin Account <span>→</span>' : 'Sign In with Supabase <span>→</span>';
+          toggleModeBtn.textContent = isSignUpMode ? 'Already have a password? Sign In' : 'First time? Create Admin Password';
+        });
+      }
+
       document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const pin = document.getElementById('admin-pin-input').value.trim();
-        const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
-        if (isHttp) {
-          try {
-            const res = await fetch('/api/blogs?action=verify', { headers: { 'x-admin-pin': pin } });
-            if (res.ok) {
-              sessionStorage.setItem('rizal_admin_pin', pin);
-              setAdminLoggedIn(true);
-              showDashboard();
-              return;
-            }
-            if (res.status !== 503 && res.status !== 404) {
-              alert('Invalid Admin PIN.');
-              return;
-            }
-          } catch (_) {}
+        const email = document.getElementById('admin-email-input').value.trim();
+        const password = document.getElementById('admin-pin-input').value;
+        if (authStatusEl) {
+          authStatusEl.style.color = 'var(--ink-muted)';
+          authStatusEl.textContent = isSignUpMode ? 'Creating Supabase admin account...' : 'Signing in with Supabase...';
         }
-        if (pin === 'admin' || pin === '1234' || pin === 'rizal') {
-          sessionStorage.setItem('rizal_admin_pin', pin);
-          setAdminLoggedIn(true);
-          showDashboard();
-        } else {
-          alert('Invalid passcode.');
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          if (isSignUpMode) {
+            const res = await window.supabaseSignUp(email, password);
+            if (res && res.access_token) {
+              showDashboard();
+            } else if (authStatusEl) {
+              authStatusEl.style.color = '#16A34A';
+              authStatusEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+              isSignUpMode = false;
+              if (submitBtn) submitBtn.innerHTML = 'Sign In with Supabase <span>→</span>';
+              if (toggleModeBtn) toggleModeBtn.textContent = 'First time? Create Admin Password';
+            }
+          } else {
+            await window.supabaseSignIn(email, password);
+            showDashboard();
+          }
+        } catch (err) {
+          if (authStatusEl) {
+            authStatusEl.style.color = '#EF4444';
+            authStatusEl.textContent = err.message || 'Authentication failed.';
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
         }
       });
 
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        sessionStorage.removeItem('rizal_admin_pin');
-        setAdminLoggedIn(false);
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (typeof window.supabaseSignOut === 'function') {
+          await window.supabaseSignOut();
+        }
         showLogin();
       });
 

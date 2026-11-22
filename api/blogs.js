@@ -8,12 +8,13 @@
  *   ADMIN_PIN (defaults to '1234' if unset — set a strong PIN in Vercel!)
  */
 
-const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://hfymxwfozvxpxjnprzvz.supabase.co').replace(/\/$/, '');
+const PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_WQFiD3pzqVNy3S6qFV5OOQ_ZG8kAzvK';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const ADMIN_PIN = process.env.ADMIN_PIN || '';
 
 function isConfigured() {
-  return Boolean(SUPABASE_URL && SERVICE_KEY);
+  return Boolean(SUPABASE_URL && (SERVICE_KEY || PUBLISHABLE_KEY));
 }
 
 function slugify(text) {
@@ -68,15 +69,18 @@ function mapPostToRow(post) {
   };
 }
 
-async function sbFetch(path, options = {}) {
+async function sbFetch(path, options = {}, userToken = '') {
+  const apiKey = SERVICE_KEY || PUBLISHABLE_KEY;
+  const authHeader = userToken ? `Bearer ${userToken}` : (SERVICE_KEY ? `Bearer ${SERVICE_KEY}` : undefined);
+  const headers = {
+    apikey: apiKey,
+    'Content-Type': 'application/json',
+    ...(authHeader ? { Authorization: authHeader } : {}),
+    ...(options.headers || {})
+  };
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
+    headers
   });
   const text = await res.text();
   let data = null;

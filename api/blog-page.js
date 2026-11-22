@@ -4,8 +4,8 @@
  * in the initial response so WhatsApp, LinkedIn, Facebook, and X previews work.
  */
 
-const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://hfymxwfozvxpxjnprzvz.supabase.co').replace(/\/$/, '');
+const API_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_WQFiD3pzqVNy3S6qFV5OOQ_ZG8kAzvK';
 const SITE_ORIGIN = (process.env.SITE_URL || 'https://rizalrhmn.vercel.app').replace(/\/$/, '');
 
 function escHtml(str) {
@@ -24,15 +24,14 @@ function toAbsoluteImageUrl(imgPath) {
 }
 
 async function fetchPublishedPostBySlug(slug) {
-  if (!SUPABASE_URL || !SERVICE_KEY || !slug) return null;
+  if (!SUPABASE_URL || !API_KEY || !slug) return null;
+  const headers = { apikey: API_KEY };
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    headers.Authorization = `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`;
+  }
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`,
-    {
-      headers: {
-        apikey: SERVICE_KEY,
-        Authorization: `Bearer ${SERVICE_KEY}`
-      }
-    }
+    { headers }
   );
   if (!res.ok) return null;
   const rows = await res.json();
