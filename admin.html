@@ -1001,23 +1001,34 @@
       showAdminToast(`✦ Article status changed to ${newStatus === 'published' ? 'Published' : 'Draft'}!`);
     }
 
+    const deletingBlogIds = new Set();
     async function removeBlogPost(id) {
+      if (deletingBlogIds.has(id)) return;
       const backup = [...getBlogPosts()];
       const target = backup.find(p => p.id === id);
-      if (typeof window.deleteBlogPostFromServer === 'function') {
-        await window.deleteBlogPostFromServer(id);
-      } else {
-        deleteBlogPost(id);
+      const label = target ? `"${target.title}"` : id;
+      if (!confirm(`Permanently delete ${label}? This will remove it from the public website.`)) {
+        return;
       }
-      loadAllData();
-      showAdminToast(`🗑 Deleted article "${target ? target.title : id}"`, async () => {
-        localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(backup));
-        if (target && typeof window.saveBlogPostToServer === 'function') {
-          await window.saveBlogPostToServer(target);
+      deletingBlogIds.add(id);
+      try {
+        let res = { ok: true, localOnly: true };
+        if (typeof window.deleteBlogPostFromServer === 'function') {
+          res = await window.deleteBlogPostFromServer(id);
+        } else {
+          deleteBlogPost(id);
         }
         loadAllData();
-        showAdminToast('✦ Article restored!');
-      });
+        if (res.ok && !res.localOnly) {
+          showAdminToast(`🗑 Permanently deleted ${label} from cloud database.`);
+        } else if (res.localOnly) {
+          showAdminToast(`🗑 Deleted ${label} locally.`);
+        } else {
+          showAdminToast(`⚠ Deleted locally, cloud delete failed: ${res.error}`);
+        }
+      } finally {
+        deletingBlogIds.delete(id);
+      }
     }
 
     function setBlogImage(path) {

@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
   const desc = escHtml(post.excerpt);
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
   return res.status(200).send(`<!DOCTYPE html>
 <html lang="en">
 <head>

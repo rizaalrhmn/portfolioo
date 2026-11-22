@@ -247,10 +247,10 @@ function renderDynamicHomeBlogs() {
   const allPosts = getBlogPosts().filter(p => p.status === 'published');
   if (allPosts.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.25rem; border-radius: 16px; border: 2px dashed #CBD5E1;">
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.25rem; border-radius: 16px; border: 2px dashed rgba(148, 163, 184, 0.45); background: var(--bg-paper);">
         <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">📓</div>
-        <h3 style="font-family: var(--font-cutout); font-size: 1.5rem; color: var(--ink-primary);">No published entries yet</h3>
-        <p style="color: var(--ink-muted); margin-top: 0.35rem;">Check back soon for new essays &amp; marketing notes.</p>
+        <h3 style="font-family: var(--font-cutout); font-size: 1.5rem; color: var(--ink-primary);">New articles coming soon.</h3>
+        <p style="color: var(--ink-muted); margin-top: 0.35rem;">Fresh notes on digital marketing, design, and creative strategy will appear here once published.</p>
       </div>
     `;
     return;

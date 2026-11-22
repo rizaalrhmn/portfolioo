@@ -364,19 +364,22 @@ function getBlogPosts() {
   try {
     const raw = localStorage.getItem(BLOG_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(DEFAULT_BLOG_POSTS));
-      return [...DEFAULT_BLOG_POSTS];
+      return [];
     }
     const posts = JSON.parse(raw);
-    if (!Array.isArray(posts)) return [...DEFAULT_BLOG_POSTS];
-    // Ensure every post has a stable slug and refresh default seed coverImage if needed
-    return posts.map((p) => {
-      const def = DEFAULT_BLOG_POSTS.find(d => d.id === p.id);
-      const slug = p.slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(p.title) : p.id);
-      return def ? { ...p, slug, coverImage: def.coverImage } : { ...p, slug };
-    });
+    if (!Array.isArray(posts)) return [];
+    return posts
+      .map((p) => {
+        const slug = p.slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(p.title) : p.id);
+        return { ...p, slug };
+      })
+      .sort((a, b) => {
+        const ta = Date.parse(a.publishedAt || a.createdAt || a.date || 0) || 0;
+        const tb = Date.parse(b.publishedAt || b.createdAt || b.date || 0) || 0;
+        return tb - ta;
+      });
   } catch (e) {
-    return [...DEFAULT_BLOG_POSTS];
+    return [];
   }
 }
 
@@ -824,9 +827,8 @@ window.syncBlogPostsFromServer = async function (includeDrafts = false, adminPin
     if (!res.ok || !data || !Array.isArray(data.posts)) {
       return { configured: false, posts: getBlogPosts(), error: data && data.error };
     }
-    if (data.posts.length > 0) {
-      localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(data.posts));
-    }
+    // Always sync server state (including empty [] when all posts are deleted)
+    localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(data.posts));
     window.dispatchEvent(new CustomEvent('rizal:blogs-synced', { detail: { posts: data.posts } }));
     return { configured: true, posts: data.posts };
   } catch (err) {
