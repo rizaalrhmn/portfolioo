@@ -4,7 +4,8 @@
  * with localStorage persistence and default seeds.
  */
 
-const BLOG_STORAGE_KEY = 'rizal_blog_posts_v3';
+const BLOG_STORAGE_KEY = 'rizal_blog_posts_v4';
+try { localStorage.removeItem('rizal_blog_posts_v3'); } catch (e) {}
 const PROJECTS_STORAGE_KEY = 'rizal_portfolio_projects_v1';
 const TESTIMONIALS_STORAGE_KEY = 'rizal_portfolio_testimonials_v1';
 const PROFILE_STORAGE_KEY = 'rizal_portfolio_profile_v1';
