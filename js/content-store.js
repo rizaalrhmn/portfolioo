@@ -903,7 +903,7 @@ window.shareBlogArticle = function (postId) {
   const post = posts.find(p => p.id === postId || p.slug === postId) || null;
   const shareUrl = window.getBlogPublicUrl(post || postId);
   const title = post ? post.title : document.title;
-  const text = post ? post.excerpt : 'Check out this article on Rizal Rahman\'s journal!';
+  const text = post ? post.excerpt : 'Check out this article on Rizal Rahman\'s blog!';
 
   let modal = document.getElementById('blog-share-modal');
   if (!modal) {

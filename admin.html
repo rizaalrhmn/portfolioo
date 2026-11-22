@@ -243,7 +243,7 @@
         <div class="action-bar-top">
           <div>
             <h2 style="font-family: var(--font-cutout); font-size: 1.8rem; color: var(--ink-primary);">
-              Journal Articles
+              Blog Articles
             </h2>
             <p style="font-size: 0.9rem; color: var(--ink-muted);">
               Add new articles, edit drafts, or delete published essays.
@@ -251,6 +251,9 @@
           </div>
 
           <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+            <button type="button" class="btn-scrapbook-secondary" id="btn-sync-blogs-cloud" onclick="syncLocalBlogsToCloud()" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+              ☁️ Sync Local Posts to Cloud
+            </button>
             <button type="button" class="btn-add-content" onclick="openBlogEditor()">
               ➕ Add New Article
             </button>
@@ -1022,6 +1025,21 @@
       updateAdminPreview('blog-image', 'blog-image-preview');
       const st = document.getElementById('blog-image-status');
       if (st) st.textContent = '';
+    }
+
+    async function syncLocalBlogsToCloud() {
+      if (typeof window.migrateLocalBlogsToServer !== 'function') return;
+      const btn = document.getElementById('btn-sync-blogs-cloud');
+      if (btn) btn.disabled = true;
+      try {
+        const res = await window.migrateLocalBlogsToServer();
+        showAdminToast(`☁️ Synced ${res.count || 0} blog post(s) to Supabase!`);
+        loadAllData();
+      } catch (err) {
+        showAdminToast(`⚠ Cloud sync failed: ${err.message}`);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     function insertTagBlog(openTag, closeTag) {

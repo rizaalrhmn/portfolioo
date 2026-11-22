@@ -59,8 +59,8 @@ module.exports = async function handler(req, res) {
   <div class="blog-hero-sheet grid-paper" style="max-width:560px;text-align:center;padding:3rem 2rem;">
     <div style="font-size:3rem;margin-bottom:0.75rem;">📓</div>
     <h1 class="blog-title-cutout" style="font-size:2.4rem;">404 — Page Not Found</h1>
-    <p style="color:var(--ink-secondary);margin:1rem 0 1.8rem;">This journal entry could not be found or has not been published yet.</p>
-    <a href="/blog.html" class="btn-scrapbook-primary">← Back to Journal &amp; Notes</a>
+    <p style="color:var(--ink-secondary);margin:1rem 0 1.8rem;">This blog post could not be found or has not been published yet.</p>
+    <a href="/blog.html" class="btn-scrapbook-primary">← Back to Blog</a>
   </div>
 </body>
 </html>`);
@@ -84,7 +84,7 @@ module.exports = async function handler(req, res) {
 
   <!-- Open Graph / WhatsApp / LinkedIn / Facebook -->
   <meta property="og:type" content="article">
-  <meta property="og:site_name" content="Rizal Rahman — Portfolio & Journal">
+  <meta property="og:site_name" content="Rizal Rahman — Portfolio & Blog">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${desc}">
   <meta property="og:url" content="${canonicalUrl}">
