@@ -332,7 +332,10 @@ function renderDynamicHomeBlogs() {
         imgEl.style.display = 'none';
       }
     }
-    if (contentEl) contentEl.innerHTML = post.content || `<p>${post.excerpt}</p>`;
+    if (contentEl) {
+      const rawBody = post.content || `<p>${post.excerpt}</p>`;
+      contentEl.innerHTML = typeof window.formatBlogArticleHtml === 'function' ? window.formatBlogArticleHtml(rawBody) : rawBody;
+    }
 
     const modalShareBtn = document.getElementById('modal-article-share-btn');
     if (modalShareBtn) {

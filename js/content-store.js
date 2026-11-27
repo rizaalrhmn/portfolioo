@@ -796,6 +796,57 @@ window.processPortfolioImageUpload = function (file) {
 };
 
 /**
+ * Automatically format plain-text blog content (newlines, numbered headings, bullets)
+ * into clean structured HTML while leaving existing HTML articles untouched.
+ */
+window.formatBlogArticleHtml = function (raw) {
+  const str = String(raw || '').trim();
+  if (!str) return '';
+  if (/<(p|h[1-6]|ul|ol|div|blockquote)\b/i.test(str)) {
+    return str;
+  }
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const formatInline = (s) => esc(s).replace(/^((?:Common problems|How to fix it|[A-Z]{2,5}\s*\([^)]+\)):)/, '<strong>$1</strong>');
+
+  const lines = str.replace(/\r\n/g, '\n').split('\n');
+  const out = [];
+  let inList = false;
+
+  const closeList = () => {
+    if (inList) {
+      out.push('</ul>');
+      inList = false;
+    }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) {
+      closeList();
+      continue;
+    }
+    if (/^[•\-*]\s+/.test(line)) {
+      if (!inList) {
+        out.push('<ul>');
+        inList = true;
+      }
+      out.push(`<li>${formatInline(line.replace(/^[•\-*]\s+/, ''))}</li>`);
+      continue;
+    }
+    closeList();
+    if (/^\d+\.\s+[^?]{3,80}$/.test(line) && !line.endsWith('.')) {
+      out.push(`<h3>${esc(line)}</h3>`);
+    } else if (/^(Quick Checklist|Frequently Asked Questions|Final Thoughts|Conclusion|Summary|Key Takeaways)$/i.test(line)) {
+      out.push(`<h3>${esc(line)}</h3>`);
+    } else {
+      out.push(`<p>${formatInline(line)}</p>`);
+    }
+  }
+  closeList();
+  return out.join('\n');
+};
+
+/**
  * Slug & Public URL Helpers
  */
 window.slugifyBlogTitle = function (text) {

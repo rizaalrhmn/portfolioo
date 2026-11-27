@@ -359,7 +359,10 @@
         imgEl.style.display = 'none';
       }
 
-      document.getElementById('modal-article-content').innerHTML = post.content || `<p>${post.excerpt}</p>`;
+      const rawBody = post.content || `<p>${post.excerpt}</p>`;
+      document.getElementById('modal-article-content').innerHTML = typeof window.formatBlogArticleHtml === 'function'
+        ? window.formatBlogArticleHtml(rawBody)
+        : rawBody;
 
       const shareBtn = document.getElementById('modal-article-share-btn');
       if (shareBtn) {
