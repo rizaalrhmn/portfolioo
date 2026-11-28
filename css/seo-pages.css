@@ -148,9 +148,9 @@
   border: 2px solid var(--line);
   border-radius: var(--radius);
   margin: 1.25rem 0 2rem;
-  aspect-ratio: 1200 / 630;
-  object-fit: cover;
   width: 100%;
+  height: auto;
+  object-fit: contain;
   box-shadow: var(--shadow);
 }
 
@@ -229,8 +229,8 @@
   border-radius: 10px;
   margin-bottom: 0.6rem;
   width: 100%;
-  aspect-ratio: 600 / 315;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 .seo-page .btn {
