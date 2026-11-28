@@ -26,8 +26,9 @@ export const SITE = {
   // Optional: Calendly / Cal.com link for the free 15-minute audit. '' hides it.
   calendarUrl: '',
 
-  // Portrait image (can be replaced with a ~800x800 WebP in /images/portrait.webp once generated)
+  // Portrait image & default Open Graph preview image (1200x630 JPEG)
   portrait: '/assets/images/freelance-digital-marketing-in-malta.png',
+  ogImage: '/images/og-default.jpg',
 
   // TODO: add each profile URL once it exists (LinkedIn, Clutch, Tminta, BeBee, Sortlist…)
   sameAs: [

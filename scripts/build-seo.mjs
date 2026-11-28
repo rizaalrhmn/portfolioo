@@ -134,7 +134,7 @@ function layout({ pathName, title, description, body, graph = [], crumbs = null,
   const canonical = abs(pathName);
   const crumbHtml = crumbs ? `<nav class="crumbs" aria-label="Breadcrumb"><ol>${crumbs.map(([n, p], i) => i === crumbs.length - 1 ? `<li aria-current="page">${esc(n)}</li>` : `<li><a href="${p}">${esc(n)}</a></li>`).join('')}</ol></nav>` : '';
   if (crumbs) graph = [...graph, breadcrumbLd(crumbs)];
-  const img = ogImage || abs(SITE.portrait);
+  const img = ogImage || abs(SITE.ogImage || SITE.portrait);
   return `<!DOCTYPE html>
 <html lang="en-MT">
 <head>
@@ -151,7 +151,10 @@ function layout({ pathName, title, description, body, graph = [], crumbs = null,
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${img}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${img}">
 ${SITE.googleVerification ? `<meta name="google-site-verification" content="${esc(SITE.googleVerification)}">` : ''}
 ${SITE.bingVerification ? `<meta name="msvalidate.01" content="${esc(SITE.bingVerification)}">` : ''}
 <meta name="theme-color" content="#FAF8F5">
