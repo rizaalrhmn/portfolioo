@@ -868,7 +868,7 @@ window.getBlogPublicUrl = function (postOrId) {
   if (isHttp) {
     return `${window.location.origin}/insights/${encodeURIComponent(slug)}/`;
   }
-  return `blog.html?article=${encodeURIComponent(slug)}`;
+  return `/insights/${encodeURIComponent(slug)}/`;
 };
 
 /**

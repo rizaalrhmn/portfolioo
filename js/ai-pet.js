@@ -522,7 +522,7 @@
                 } else if (typeof window.openArticle === 'function') {
                   window.openArticle('post-digital-marketing-guide');
                 } else {
-                  window.location.href = 'blog.html';
+                  window.location.href = '/insights/';
                 }
               }
             }
@@ -592,7 +592,7 @@
               if (typeof window.openHomeBlogArticle === 'function') {
                 window.openHomeBlogArticle('post-digital-marketing-guide');
               } else {
-                window.location.href = 'blog.html';
+                window.location.href = '/insights/';
               }
             }
           }

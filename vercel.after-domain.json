@@ -35,8 +35,30 @@
       "permanent": true
     },
     {
+      "source": "/blog.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "article",
+          "value": "(?<slug>[a-z0-9-]+)"
+        }
+      ],
+      "destination": "/insights/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/blog.html",
+      "destination": "/insights/",
+      "permanent": true
+    },
+    {
       "source": "/blog",
       "destination": "/insights/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/insights/:slug/",
       "permanent": true
     }
   ],

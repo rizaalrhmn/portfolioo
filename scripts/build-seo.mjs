@@ -401,11 +401,21 @@ ${ctaBlock()}</article>`;
       extraHead: `<meta property="article:published_time" content="${published}"><meta property="article:modified_time" content="${modified}">`,
     }));
     sitemap[sitemap.length - 1].lastmod = modified.slice(0, 10);
-    cards.push({ slug, title: row.title, description, cover, dateLabel, published });
+    cards.push({ slug, title: row.title, description, cover, dateLabel, published, category: row.category || 'Digital Marketing', tags });
   }
-  const body = `<div class="wrap"><header class="page-hero"><h1>Malta Digital Marketing Insights</h1><p class="lead">Practical guides on SEO, paid ads and growth for Maltese businesses.</p></header>
-${cards.length ? `<div class="grid">${cards.map((c) => `<a class="card card-link" href="/insights/${c.slug}/">${c.cover ? `<img src="${esc(c.cover)}" alt="" width="600" height="315" loading="lazy">` : ''}<p class="eyebrow"><time datetime="${c.published}">${c.dateLabel}</time></p><h2>${esc(c.title)}</h2><p>${esc(c.description)}</p><span>Read article →</span></a>`).join('')}</div>` : '<p>New guides are on the way.</p>'}
-${ctaBlock()}</div>`;
+  const categories = [...new Set(cards.map((c) => c.category).filter(Boolean))];
+  const controls = cards.length ? `<div class="insights-controls">
+  <label class="insights-search"><span aria-hidden="true">🔍</span><input type="search" id="insights-search" placeholder="Search articles by topic, keyword, or tag..." aria-label="Search articles"></label>
+  <div class="insights-pills" id="insights-pills" role="group" aria-label="Filter by category">
+    <button type="button" class="pill active" data-cat="all">All (${cards.length})</button>
+    ${categories.map((cat) => `<button type="button" class="pill" data-cat="${esc(cat)}">${esc(cat)}</button>`).join('')}
+  </div>
+</div>` : '';
+  const filterScript = cards.length ? `<script>(function(){var s=document.getElementById('insights-search'),p=document.getElementById('insights-pills'),g=document.getElementById('insights-grid'),e=document.getElementById('insights-empty');if(!g)return;var cat='all',q='';function run(){var n=0;g.querySelectorAll('[data-cat]').forEach(function(c){var mc=cat==='all'||c.dataset.cat===cat;var mq=!q||(c.dataset.search||'').indexOf(q)!==-1;var show=mc&&mq;c.style.display=show?'':'none';if(show)n++;});if(e)e.style.display=n?'none':'block';}if(s)s.addEventListener('input',function(){q=s.value.trim().toLowerCase();run();});if(p)p.addEventListener('click',function(ev){var b=ev.target.closest('button[data-cat]');if(!b)return;p.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});b.classList.add('active');cat=b.dataset.cat;run();});})();</script>` : '';
+  const body = `<div class="wrap"><header class="page-hero"><p class="eyebrow">Blog &amp; Field Notes · Malta &amp; Beyond</p><h1>Malta Digital Marketing Insights</h1><p class="lead">Practical guides, frameworks and essays on SEO, paid ads, branding and growth.</p></header>
+${controls}
+${cards.length ? `<div class="grid" id="insights-grid">${cards.map((c) => `<a class="card card-link" href="/insights/${c.slug}/" data-cat="${esc(c.category)}" data-search="${esc((c.title + ' ' + c.description + ' ' + c.category + ' ' + c.tags.join(' ')).toLowerCase())}">${c.cover ? `<img src="${esc(c.cover)}" alt="" width="600" height="315" loading="lazy">` : ''}<p class="eyebrow">${esc(c.category)} · <time datetime="${c.published}">${c.dateLabel}</time></p><h2>${esc(c.title)}</h2><p>${esc(c.description)}</p><span>Read article →</span></a>`).join('')}</div><p id="insights-empty" class="card" style="display:none;text-align:center;">No matching articles found. Try clearing your search or choosing another category.</p>` : '<p>New guides are on the way.</p>'}
+${ctaBlock()}</div>${filterScript}`;
   write('insights/index.html', layout({ pathName: '/insights/', title: 'Malta Digital Marketing Insights & Guides | Rizal Rahman', description: 'Guides on SEO, Google Ads, Meta Ads and AI search for Maltese SMEs — pricing, grants, Bing, hospitality and B2B.', body, graph: [{ '@type': 'Blog', name: 'Malta Digital Marketing Insights', url: abs('/insights/'), author: { '@id': personId } }], crumbs: [['Home', '/'], ['Insights', '/insights/']] }));
   return cards;
 }

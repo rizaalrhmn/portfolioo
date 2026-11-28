@@ -509,6 +509,64 @@
   margin-top: 0.25rem;
 }
 
+/* ── insights search & category filter ── */
+.seo-page .insights-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.seo-page .insights-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 260px;
+  max-width: 420px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  box-shadow: var(--shadow);
+}
+
+.seo-page .insights-search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  width: 100%;
+}
+
+.seo-page .insights-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.seo-page .insights-pills .pill {
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font: 700 0.85rem var(--font-body);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.seo-page .insights-pills .pill:hover {
+  transform: translateY(-1px);
+}
+
+.seo-page .insights-pills .pill.active {
+  background: var(--accent);
+  color: #FFFFFF;
+}
+
 /* ── footer grid inside .scrapbook-footer ── */
 .seo-page .seo-footer-grid {
   display: grid;
