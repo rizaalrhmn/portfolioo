@@ -158,7 +158,9 @@ function layout({ pathName, title, description, body, graph = [], crumbs = null,
 ${SITE.googleVerification ? `<meta name="google-site-verification" content="${esc(SITE.googleVerification)}">` : ''}
 ${SITE.bingVerification ? `<meta name="msvalidate.01" content="${esc(SITE.bingVerification)}">` : ''}
 <meta name="theme-color" content="#FAF8F5">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold'>R</text></svg>">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/images/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${SITE.fontsHref}">
