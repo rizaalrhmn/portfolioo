@@ -125,13 +125,14 @@ const NAV = [
   ['/contact/', 'Contact'],
 ];
 
-function layout({ pathName, title, description, body, graph = [], crumbs = null, ogImage = null, ogType = 'website', noindex = false, extraHead = '' }) {
-  if (noindex && pathName !== '/404') warnings.push(`noindex until TODOs are filled: ${pathName}`);
-  else if (pathName !== '/404') sitemap.push({ loc: abs(pathName), lastmod: today });
+function layout({ pathName, title, description, body, graph = [], crumbs = null, ogImage = null, ogType = 'website', noindex = false, robots = null, extraHead = '' }) {
+  if (noindex && pathName !== '/404' && pathName !== '/thank-you/') warnings.push(`noindex until TODOs are filled: ${pathName}`);
+  else if (!noindex && pathName !== '/404' && pathName !== '/thank-you/') sitemap.push({ loc: abs(pathName), lastmod: today });
   if (title.length > 60) title = title.replace(/ \| Rizal Rahman$/, '');
   if (title.length > 60) title = title.slice(0, 57).trimEnd() + '...';
   if (description.length > 160) description = description.slice(0, 157).trimEnd() + '...';
   const canonical = abs(pathName);
+  const robotsValue = robots || (noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large');
   const crumbHtml = crumbs ? `<nav class="crumbs" aria-label="Breadcrumb"><ol>${crumbs.map(([n, p], i) => i === crumbs.length - 1 ? `<li aria-current="page">${esc(n)}</li>` : `<li><a href="${p}">${esc(n)}</a></li>`).join('')}</ol></nav>` : '';
   if (crumbs) graph = [...graph, breadcrumbLd(crumbs)];
   const img = ogImage || abs(SITE.ogImage || SITE.portrait);
@@ -143,7 +144,7 @@ function layout({ pathName, title, description, body, graph = [], crumbs = null,
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${canonical}">
-<meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}">
+<meta name="robots" content="${robotsValue}">
 <meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="${esc(SITE.brand)}">
 <meta property="og:locale" content="en_GB">
@@ -460,6 +461,47 @@ async function patchExistingHtml(cards) {
   }
 }
 
+function thankYouPage() {
+  const body = `<div class="wrap" style="padding-top:3rem;padding-bottom:4rem;">
+  <section class="card" style="max-width:640px;margin:0 auto;text-align:center;padding:2.5rem 2rem;">
+    <p class="eyebrow">Message Delivered ✈</p>
+    <h1 id="ty-heading">Thank you for your note!</h1>
+    <p class="lead" style="margin:0.75rem auto 1.25rem;">Your message has been sent to Rizal Rahman. ${esc(SITE.responseSla)}.</p>
+    <p class="small" style="margin-bottom:1.5rem;">Redirecting you back to the homepage in <strong id="ty-countdown">5</strong> seconds…</p>
+    <a class="btn-scrapbook-primary" href="/">Return to Homepage Now <span>→</span></a>
+  </section>
+</div>
+<script>
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var name = (params.get('name') || '').trim();
+  if (name) {
+    var h = document.getElementById('ty-heading');
+    if (h) h.textContent = 'Thank you, ' + name + '!';
+  }
+  var secs = 5;
+  var el = document.getElementById('ty-countdown');
+  var timer = setInterval(function(){
+    secs -= 1;
+    if (el && secs >= 0) el.textContent = String(secs);
+    if (secs <= 0) {
+      clearInterval(timer);
+      window.location.replace('/');
+    }
+  }, 1000);
+})();
+</script>`;
+  return write('thank-you/index.html', layout({
+    pathName: '/thank-you/',
+    title: 'Thank You | Rizal Rahman',
+    description: 'Thank you for sending a message to Rizal Rahman.',
+    body,
+    noindex: true,
+    robots: 'noindex, nofollow',
+    extraHead: '<meta http-equiv="refresh" content="5; url=/">',
+  }).replace(/<link rel="canonical"[^>]*>\n/, ''));
+}
+
 function notFoundPage() {
   const body = `<div class="wrap"><header class="page-hero"><h1>Page not found</h1><p class="lead">That page doesn’t exist (URLs are lowercase). Try one of these:</p></header>
 <ul class="links"><li><a href="/">Freelance digital marketing in Malta</a></li>${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul></div>`;
@@ -489,6 +531,7 @@ contactPage();
 caseStudyPages();
 const cards = await insightPages(posts);
 await notFoundPage();
+await thankYouPage();
 await Promise.all(pending);
 await patchExistingHtml(cards);
 const count = await seoFiles();

@@ -627,9 +627,10 @@ function initContactForm() {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('contact-name')?.value || 'Friend';
-    alert(`Thank you, ${name}! Your note has been dispatched to Rizal.`);
+    const name = (document.getElementById('contact-name')?.value || '').trim();
     form.reset();
+    const query = name ? `?name=${encodeURIComponent(name)}` : '';
+    window.location.href = `/thank-you/${query}`;
   });
 }
 
