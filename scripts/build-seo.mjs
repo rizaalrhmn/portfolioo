@@ -120,7 +120,7 @@ const NAV = [
   ['/services/', 'Services'],
   ['/case-studies/', 'Case Studies'],
   ['/pricing-malta/', 'Pricing'],
-  ['/insights/', 'Insights'],
+  ['/insights/', 'Blogs'],
   ['/about/', 'About'],
   ['/contact/', 'Contact'],
 ];
