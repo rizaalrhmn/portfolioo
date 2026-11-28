@@ -260,12 +260,14 @@ function renderDynamicHomeBlogs() {
 
   grid.innerHTML = allPosts.map((post, idx) => {
     const tapeClass = tapeColors[idx % tapeColors.length];
+    const slug = post.slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(post.title) : post.id);
+    const articleUrl = `/insights/${encodeURIComponent(slug)}/`;
     return `
-      <article class="blog-card" onclick="window.openHomeBlogArticle('${post.id}')">
+      <article class="blog-card" onclick="if(!event.target.closest('a,button')) window.openHomeBlogArticle('${post.id}')">
         <div class="blog-card-media">
           <span class="blog-badge-category">${post.category}</span>
           <div class="washi-tape tape-tr ${tapeClass}"></div>
-          <img src="${post.coverImage || 'assets/images/project-1-art.jpg'}" alt="${post.title}" loading="lazy">
+          <img src="${post.coverImage || '/assets/images/project-1-art.jpg'}" alt="${post.title}" loading="lazy" decoding="async">
         </div>
         <div class="blog-card-content">
           <div class="blog-meta-row">
@@ -273,10 +275,10 @@ function renderDynamicHomeBlogs() {
             <span class="blog-meta-dot">✦</span>
             <span>${post.readTime}</span>
           </div>
-          <h3 class="blog-card-title">${post.title}</h3>
+          <h3 class="blog-card-title"><a href="${articleUrl}" onclick="if(!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.openHomeBlogArticle('${post.id}'); }">${post.title}</a></h3>
           <p class="blog-card-excerpt">${post.excerpt}</p>
           <div class="blog-card-footer">
-            <span class="btn-read-entry">Read Entry <span>↗</span></span>
+            <a class="btn-read-entry" href="${articleUrl}" onclick="if(!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.openHomeBlogArticle('${post.id}'); }">Read Entry <span>↗</span></a>
             <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
               <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.shareBlogArticle && window.shareBlogArticle('${post.id}')" title="Share this blog post">🔗 Share</button>
               <span class="blog-views-count">👁 ${post.views || 0}</span>

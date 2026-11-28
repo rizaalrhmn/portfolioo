@@ -1,0 +1,11 @@
+{
+  "name": "rizal-portfolio",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node scripts/build-seo.mjs",
+    "preview": "node scripts/build-seo.mjs && npx serve dist",
+    "indexnow": "node scripts/indexnow.mjs",
+    "images": "node scripts/optimize-images.mjs"
+  }
+}

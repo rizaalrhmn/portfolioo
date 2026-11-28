@@ -1,0 +1,561 @@
+/* ─────────────────────────────────────────────────────────────
+   seo-pages.css — LAYOUT ONLY for generated pages (.seo-page).
+   Loaded AFTER css/style.css, so the scrapbook theme (colours,
+   fonts, light & dark mode) stays completely in charge.
+   Never linked on the homepage.
+   ───────────────────────────────────────────────────────────── */
+.seo-page {
+  --ink: var(--ink-primary);
+  --muted: var(--ink-secondary);
+  --paper: var(--bg-canvas);
+  --card: var(--bg-paper);
+  --line: var(--ink-primary);
+  --accent: var(--color-pink);
+  --accent-soft: var(--color-yellow-soft);
+  --radius: var(--radius-card);
+  --shadow: var(--shadow-paper);
+  margin: 0;
+}
+
+.seo-page a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.seo-page .scrapbook-header a,
+.seo-page .scrapbook-footer .footer-home-link,
+.seo-page .btn-scrapbook-primary,
+.seo-page .btn-scrapbook-secondary {
+  color: inherit;
+}
+
+.seo-page .btn-scrapbook-primary {
+  color: #FFFFFF;
+}
+
+.seo-page h1,
+.seo-page h2,
+.seo-page h3 {
+  font-family: var(--font-cutout);
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.seo-page h1 {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+  font-weight: 700;
+  margin: 0.35em 0 0.45em;
+}
+
+.seo-page h2 {
+  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  font-weight: 700;
+  margin: 2.2rem 0 1rem;
+}
+
+.seo-page h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.45rem;
+}
+
+.seo-page .skip {
+  position: absolute;
+  left: -999px;
+}
+
+.seo-page .skip:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--card);
+  color: var(--ink);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  z-index: 200;
+}
+
+.seo-page .wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2rem) 3.5rem;
+}
+
+.seo-page .post .prose {
+  max-width: 740px;
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+.seo-page .post .prose p,
+.seo-page .post .prose ul,
+.seo-page .post .prose ol {
+  margin-bottom: 1.1rem;
+}
+
+.seo-page .post .prose ul,
+.seo-page .post .prose ol {
+  padding-left: 1.4rem;
+}
+
+.seo-page .crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  max-width: 1080px;
+  margin: 1.25rem auto 0;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.seo-page .crumbs li + li::before {
+  content: '›';
+  margin-right: 0.4rem;
+}
+
+.seo-page .page-hero {
+  padding: 1.5rem 0 0.75rem;
+}
+
+.seo-page .lead {
+  font-size: 1.12rem;
+  color: var(--muted);
+  max-width: 760px;
+  margin-top: 0.5rem;
+}
+
+.seo-page .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 0;
+}
+
+.seo-page .byline,
+.seo-page .small {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 0.45rem;
+}
+
+.seo-page .cover {
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  margin: 1.25rem 0 2rem;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+.seo-page .prose img {
+  border-radius: 10px;
+  margin: 1.25rem 0;
+}
+
+.seo-page .prose h2 {
+  margin-top: 2.2rem;
+}
+
+/* ── cards, grids, buttons ── */
+.seo-page .grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.seo-page .card {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.seo-page .card p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+}
+
+.seo-page .card h2 {
+  margin-top: 0;
+}
+
+.seo-page .card ul {
+  padding-left: 1.2rem;
+  margin: 0.8rem 0 1.25rem;
+  color: var(--muted);
+}
+
+.seo-page .card li {
+  margin-bottom: 0.35rem;
+}
+
+.seo-page .card-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.seo-page .card-link:hover {
+  transform: translate(-2px, -3px);
+  box-shadow: var(--shadow-paper-float);
+}
+
+.seo-page .card-link h2,
+.seo-page .card-link h3 {
+  margin: 0.2rem 0;
+  font-size: 1.25rem;
+}
+
+.seo-page .card-link span {
+  margin-top: auto;
+  color: var(--accent);
+  font-weight: 700;
+  padding-top: 0.7rem;
+}
+
+.seo-page .card-link img {
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+  width: 100%;
+  aspect-ratio: 600 / 315;
+  object-fit: cover;
+}
+
+.seo-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.68rem 1.35rem;
+  font: 700 0.95rem var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--line);
+  transition: transform 0.15s ease;
+}
+
+.seo-page .btn:hover {
+  transform: translate(-1px, -1px);
+}
+
+.seo-page .btn-ghost {
+  background: var(--card);
+  color: var(--ink);
+}
+
+.seo-page .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0;
+  margin-top: 0.9rem;
+}
+
+.seo-page .chips span {
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 0.18rem 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+/* ── comparison table ── */
+.seo-page .table-wrap {
+  overflow-x: auto;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.seo-page table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.seo-page th,
+.seo-page td {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--grid-line);
+  vertical-align: top;
+  color: var(--ink);
+}
+
+.seo-page thead th {
+  background: var(--accent-soft);
+  font-family: var(--font-cutout);
+}
+
+.seo-page tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+/* ── FAQ details/summary ── */
+.seo-page .faq details {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.95rem 1.25rem;
+  margin-bottom: 0.85rem;
+  box-shadow: var(--shadow);
+}
+
+.seo-page .faq summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.seo-page .faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.seo-page .faq summary h3 {
+  display: inline;
+  font-size: 1.05rem;
+}
+
+.seo-page .faq summary::after {
+  content: '+';
+  float: right;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.seo-page .faq details[open] summary::after {
+  content: '–';
+}
+
+.seo-page .faq details p {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+}
+
+/* ── CTA band ── */
+.seo-page .cta-band {
+  margin: 3rem 0 0;
+  padding: 2rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  box-shadow: var(--shadow);
+}
+
+.seo-page .cta-band h2 {
+  margin-top: 0;
+}
+
+.seo-page .cta-band p {
+  color: var(--ink);
+}
+
+.seo-page .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.2rem;
+}
+
+/* ── page-specific layouts ── */
+.seo-page .steps {
+  padding-left: 1.35rem;
+  display: grid;
+  gap: 0.65rem;
+  color: var(--muted);
+}
+
+.seo-page .steps strong {
+  display: inline-block;
+  min-width: 8.5rem;
+  color: var(--ink);
+}
+
+.seo-page .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.5rem;
+  padding-left: 1.2rem;
+}
+
+.seo-page .tiers .tier {
+  display: flex;
+  flex-direction: column;
+}
+
+.seo-page .tiers .tier .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.seo-page .tier.featured {
+  background: var(--accent-soft);
+}
+
+.seo-page .price {
+  font-family: var(--font-cutout);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0.25rem 0 0.65rem;
+}
+
+.seo-page .price span {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.seo-page .notes {
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.seo-page .notes li {
+  margin-bottom: 0.5rem;
+}
+
+.seo-page .stat-v {
+  font-family: var(--font-cutout);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.seo-page blockquote {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 5px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.seo-page cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.seo-page .about-grid {
+  display: grid;
+  grid-template-columns: minmax(200px, 320px) 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.seo-page .about-grid img {
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  height: auto;
+}
+
+.seo-page .about-grid p {
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.seo-page .contact-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.seo-page form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.seo-page form input,
+.seo-page form select,
+.seo-page form textarea {
+  font: inherit;
+  padding: 0.68rem 0.85rem;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.seo-page form .btn {
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* ── footer grid inside .scrapbook-footer ── */
+.seo-page .seo-footer-grid {
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  text-align: left;
+  padding-bottom: 1.5rem;
+}
+
+.seo-page .seo-footer-grid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.seo-page .seo-footer-grid p {
+  color: var(--muted);
+  margin: 0.35rem 0;
+  font-size: 0.94rem;
+}
+
+.seo-page .seo-footer-grid .f-name {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.seo-page .f-copy {
+  border-top: 1px dashed var(--grid-line);
+  padding-top: 1rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .seo-page .about-grid,
+  .seo-page .contact-grid,
+  .seo-page .seo-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seo-page * {
+    transition: none !important;
+  }
+}

@@ -12,12 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Kalam:wght@400;700&family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Silkscreen&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
+  <meta name="robots" content="noindex, follow">
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/blog.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/ai-pet.css">
-  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/blog.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/ai-pet.css">
+  <script src="/js/theme.js"></script>
 </head>
 <body>
 
@@ -34,18 +35,17 @@
   <header class="scrapbook-header" id="site-header">
     <div class="container">
       <div class="header-nav-row">
-        <a href="index.html" class="brand-stamp" aria-label="Rizal Rahman Home">
+        <a href="/" class="brand-stamp" aria-label="Rizal Rahman Home">
           RIZAL<span class="brand-dot">★</span>
         </a>
 
         <nav aria-label="Primary Navigation">
           <ul class="nav-links-list" id="nav-menu">
-            <li><a href="index.html#home" class="nav-link">Home</a></li>
-            <li><a href="index.html#about" class="nav-link">About</a></li>
-            <li><a href="index.html#resume" class="nav-link">Resume</a></li>
-            <li><a href="index.html#specialties" class="nav-link">Specialties</a></li>
-            <li><a href="index.html#projects" class="nav-link">Projects</a></li>
-            <li><a href="blog.html" class="nav-link active">Blog ★</a></li>
+            <li><a href="/#home" class="nav-link">Home</a></li>
+            <li><a href="/services/" class="nav-link">Services</a></li>
+            <li><a href="/case-studies/" class="nav-link">Case Studies</a></li>
+            <li><a href="/pricing-malta/" class="nav-link">Pricing</a></li>
+            <li><a href="/insights/" class="nav-link active">Insights ★</a></li>
           </ul>
         </nav>
 
@@ -54,7 +54,7 @@
             <span class="theme-icon-sun" aria-hidden="true">☀️</span>
             <span class="theme-icon-moon" aria-hidden="true">🌙</span>
           </button>
-          <a href="index.html#contact" class="header-cta-btn">
+          <a href="/contact/" class="header-cta-btn">
             Let's Talk <span>✎</span>
           </a>
         </div>
@@ -163,11 +163,11 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-stamp-mark">
-          <a href="index.html" class="footer-home-link" aria-label="Rizal Rahman Home">RIZAL RAHMAN<span style="color: var(--color-pink);">®</span></a>
+          <a href="/" class="footer-home-link" aria-label="Rizal Rahman Home">RIZAL RAHMAN<span style="color: var(--color-pink);">®</span></a>
         </div>
 
         <div>
-          Handcrafted with paper, tape & code • <a href="index.html" style="text-decoration: underline;">Portfolio Home</a>
+          Handcrafted with paper, tape & code • <a href="/" style="text-decoration: underline;">Portfolio Home</a>
         </div>
 
         <button class="btn-back-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
@@ -194,10 +194,10 @@
   </button>
 
   <!-- Scripts -->
-  <script src="js/content-store.js"></script>
-  <script src="js/blog-store.js"></script>
-  <script src="js/animations.js"></script>
-  <script src="js/ai-pet.js"></script>
+  <script src="/js/content-store.js" defer></script>
+  <script src="/js/blog-store.js" defer></script>
+  <script src="/js/animations.js" defer></script>
+  <script src="/js/ai-pet.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       initBlogPage();
@@ -304,12 +304,14 @@
 
       grid.innerHTML = filtered.map((post, index) => {
         const tapeClass = tapeColors[index % tapeColors.length];
+        const slug = post.slug || (typeof window.slugifyBlogTitle === 'function' ? window.slugifyBlogTitle(post.title) : post.id);
+        const articleUrl = `/insights/${encodeURIComponent(slug)}/`;
         return `
-          <article class="blog-card reveal-on-scroll" onclick="openArticle('${post.id}')">
+          <article class="blog-card reveal-on-scroll" onclick="if(!event.target.closest('a,button')) openArticle('${post.id}')">
             <div class="blog-card-media">
               <span class="blog-badge-category">${post.category}</span>
               <div class="washi-tape tape-tr ${tapeClass}"></div>
-              <img src="${post.coverImage || 'assets/images/project-1-art.jpg'}" alt="${post.title}" loading="lazy">
+              <img src="${post.coverImage || '/assets/images/project-1-art.jpg'}" alt="${post.title}" loading="lazy" decoding="async">
             </div>
 
             <div class="blog-card-content">
@@ -319,11 +321,11 @@
                 <span>${post.readTime}</span>
               </div>
 
-              <h2 class="blog-card-title">${post.title}</h2>
+              <h2 class="blog-card-title"><a href="${articleUrl}" onclick="if(!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0){ event.preventDefault(); openArticle('${post.id}'); }">${post.title}</a></h2>
               <p class="blog-card-excerpt">${post.excerpt}</p>
 
               <div class="blog-card-footer">
-                <span class="btn-read-entry">Read Entry <span>↗</span></span>
+                <a class="btn-read-entry" href="${articleUrl}" onclick="if(!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0){ event.preventDefault(); openArticle('${post.id}'); }">Read Entry <span>↗</span></a>
                 <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
                   <button type="button" class="btn-admin-action" onclick="event.stopPropagation(); window.shareBlogArticle && window.shareBlogArticle('${post.id}')" title="Share this blog post">🔗 Share</button>
                   <span class="blog-views-count">👁 ${post.views || 0}</span>

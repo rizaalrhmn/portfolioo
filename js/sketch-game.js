@@ -7,7 +7,12 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', () => {
-    initSketchbookGame();
+    const start = () => initSketchbookGame();
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(start, { timeout: 2500 });
+    } else {
+      setTimeout(start, 1);
+    }
   });
 
   function initSketchbookGame() {

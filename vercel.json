@@ -1,12 +1,41 @@
 {
-  "rewrites": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node scripts/build-seo.mjs",
+  "outputDirectory": "dist",
+  "regions": ["fra1"],
+  "redirects": [
     {
-      "source": "/blog",
-      "destination": "/blog.html"
+      "source": "/",
+      "has": [{ "type": "query", "key": "article", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/insights/:slug/",
+      "permanent": true
     },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/blog", "destination": "/insights/", "permanent": true }
+  ],
+  "rewrites": [
     {
       "source": "/blog/:slug",
       "destination": "/api/blog-page?slug=:slug"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    },
+    {
+      "source": "/(css|js)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000, stale-while-revalidate=604800" }]
     }
   ]
 }

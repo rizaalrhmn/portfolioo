@@ -11,7 +11,12 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', () => {
-    initRizzyAIPet();
+    const start = () => initRizzyAIPet();
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(start, { timeout: 2500 });
+    } else {
+      setTimeout(start, 1);
+    }
   });
 
   function initRizzyAIPet() {

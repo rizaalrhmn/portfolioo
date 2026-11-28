@@ -866,7 +866,7 @@ window.getBlogPublicUrl = function (postOrId) {
   const slug = (post && post.slug) || (post && post.title && window.slugifyBlogTitle(post.title)) || String(postOrId || '');
   const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
   if (isHttp) {
-    return `${window.location.origin}/blog/${encodeURIComponent(slug)}`;
+    return `${window.location.origin}/insights/${encodeURIComponent(slug)}/`;
   }
   return `blog.html?article=${encodeURIComponent(slug)}`;
 };
